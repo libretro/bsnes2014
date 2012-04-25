@@ -1,6 +1,12 @@
 void InterfaceSNES::initialize() {
+  loadFirmware("Super Famicom.sys/manifest.xml", "system.smp", SNES::smp.iplrom, 64u);
+
   SNES::interface = this;
   SNES::system.init();
+}
+
+string InterfaceSNES::markup() {
+  return SNES::cartridge.information.markup;
 }
 
 void InterfaceSNES::setController(bool port, unsigned device) {
@@ -61,7 +67,7 @@ bool InterfaceSNES::loadCartridge(string basename) {
 
   string markup;
   markup.readfile(interface->base.filename("manifest.xml", ".xml"));
-  if(markup.empty()) markup = SnesCartridge(data, size).markup;
+  if(markup.empty()) markup = SuperFamicomCartridge(data, size).markup;
 
   SNES::cartridge.rom.copy(data, size);
   SNES::cartridge.load(SNES::Cartridge::Mode::Normal, markup);
@@ -89,7 +95,7 @@ bool InterfaceSNES::loadSatellaviewSlottedCartridge(string basename, string slot
 
   string markup;
   markup.readfile(interface->base.filename("manifest.xml", ".xml"));
-  if(markup.empty()) markup = SnesCartridge(data[0], size[0]).markup;
+  if(markup.empty()) markup = SuperFamicomCartridge(data[0], size[0]).markup;
 
   SNES::cartridge.rom.copy(data[0], size[0]);
   if(data[1]) SNES::bsxflash.memory.copy(data[1], size[1]);
@@ -119,7 +125,7 @@ bool InterfaceSNES::loadSatellaviewCartridge(string basename, string slotname) {
 
   string markup;
   markup.readfile(interface->base.filename("manifest.xml", ".xml"));
-  if(markup.empty()) markup = SnesCartridge(data[0], size[0]).markup;
+  if(markup.empty()) markup = SuperFamicomCartridge(data[0], size[0]).markup;
 
   SNES::cartridge.rom.copy(data[0], size[0]);
   if(data[1]) SNES::bsxflash.memory.copy(data[1], size[1]);
@@ -154,7 +160,7 @@ bool InterfaceSNES::loadSufamiTurboCartridge(string basename, string slotAname, 
 
   string markup;
   markup.readfile(interface->base.filename("manifest.xml", ".xml"));
-  if(markup.empty()) markup = SnesCartridge(data[0], size[0]).markup;
+  if(markup.empty()) markup = SuperFamicomCartridge(data[0], size[0]).markup;
 
   SNES::cartridge.rom.copy(data[0], size[0]);
   if(data[1]) SNES::sufamiturbo.slotA.rom.copy(data[1], size[1]);
@@ -186,14 +192,14 @@ bool InterfaceSNES::loadSuperGameBoyCartridge(string basename, string slotname) 
 
   string markup;
   markup.readfile(interface->base.filename("manifest.xml", ".xml"));
-  if(markup.empty()) markup = SnesCartridge(data[0], size[0]).markup;
+  if(markup.empty()) markup = SuperFamicomCartridge(data[0], size[0]).markup;
 
   string gbMarkup;
   gbMarkup.readfile(interface->slot[0].filename("manifest.xml", ".xml"));
   if(gbMarkup.empty()) gbMarkup = GameBoyCartridge(data[1], size[1]).markup;
 
   SNES::cartridge.rom.copy(data[0], size[0]);
-  GameBoy::cartridge.load(GameBoy::System::Revision::SuperGameBoy, gbMarkup, data[1], size[1]);
+  GB::cartridge.load(GB::System::Revision::SuperGameBoy, gbMarkup, data[1], size[1]);
   SNES::cartridge.load(SNES::Cartridge::Mode::SuperGameBoy, markup);
   SNES::system.power();
 
@@ -225,17 +231,17 @@ void InterfaceSNES::run() {
 
 string InterfaceSNES::memoryName(SNES::Cartridge::NonVolatileRAM &memory) {
   if(memory.slot == SNES::Cartridge::Slot::Base) {
-    if(memory.id == "program.ram") return interface->base.filename("program.ram", ".srm");
-    if(memory.id == "program.rtc") return interface->base.filename("program.rtc", ".rtc");
+    if(memory.id == "save.ram") return interface->base.filename("save.ram", ".srm");
+    if(memory.id == "rtc.ram") return interface->base.filename("rtc.ram", ".rtc");
     if(memory.id == "upd96050.ram") return interface->base.filename("upd96050.ram", ".nec");
     if(memory.id == "bsx.ram") return interface->base.filename("bsx.ram", ".bss");
     if(memory.id == "bsx.psram") return interface->base.filename("bsx.psram", ".bsp");
   }
   if(memory.slot == SNES::Cartridge::Slot::SufamiTurboA) {
-    if(memory.id == "program.ram") return interface->slot[0].filename("program.ram", ".sts");
+    if(memory.id == "save.ram") return interface->slot[0].filename("save.ram", ".sts");
   }
   if(memory.slot == SNES::Cartridge::Slot::SufamiTurboB) {
-    if(memory.id == "program.ram") return interface->slot[1].filename("program.ram", ".sts");
+    if(memory.id == "save.ram") return interface->slot[1].filename("save.ram", ".sts");
   }
   return "";
 }
@@ -256,11 +262,11 @@ void InterfaceSNES::loadMemory() {
   }
 
   if(SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy) {
-    if(GameBoy::cartridge.ramsize) {
+    if(GB::cartridge.ramsize) {
       uint8_t *data;
       unsigned size;
-      if(file::read(interface->slot[0].filename("program.ram", ".sav"), data, size)) {
-        memcpy(GameBoy::cartridge.ramdata, data, min(GameBoy::cartridge.ramsize, size));
+      if(file::read(interface->slot[0].filename("save.ram", ".sav"), data, size)) {
+        memcpy(GB::cartridge.ramdata, data, min(GB::cartridge.ramsize, size));
         delete[] data;
       }
     }
@@ -278,9 +284,9 @@ void InterfaceSNES::saveMemory() {
   }
 
   if(SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy) {
-    if(GameBoy::cartridge.ramsize) {
-      file::write(interface->slot[0].filename("program.ram", ".sav"),
-        GameBoy::cartridge.ramdata, GameBoy::cartridge.ramsize
+    if(GB::cartridge.ramsize) {
+      file::write(interface->slot[0].filename("save.ram", ".sav"),
+        GB::cartridge.ramdata, GB::cartridge.ramsize
       );
     }
   }
@@ -297,18 +303,18 @@ bool InterfaceSNES::unserialize(serializer &s) {
 
 void InterfaceSNES::setCheats(const lstring &list) {
   if(SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy) {
-    GameBoy::cheat.reset();
+    GB::cheat.reset();
     for(auto &code : list) {
       lstring codelist;
       codelist.split("+", code);
       for(auto &part : codelist) {
         unsigned addr, data, comp;
-        if(GameBoy::Cheat::decode(part, addr, data, comp)) {
-          GameBoy::cheat.append({ addr, data, comp });
+        if(GB::Cheat::decode(part, addr, data, comp)) {
+          GB::cheat.append({ addr, data, comp });
         }
       }
     }
-    GameBoy::cheat.synchronize();
+    GB::cheat.synchronize();
     return;
   }
 

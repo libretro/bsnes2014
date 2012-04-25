@@ -2,11 +2,14 @@
 #define SNES_HPP
 
 #include <base/base.hpp>
+#include <processor/arm/arm.hpp>
+#include <processor/hg51b/hg51b.hpp>
+#include <processor/upd96050/upd96050.hpp>
 
 namespace SNES {
   namespace Info {
     static const char Name[] = "bsnes";
-    static const unsigned SerializerVersion = 23;
+    static const unsigned SerializerVersion = 24;
   }
 }
 
@@ -20,11 +23,11 @@ namespace SNES {
 #include <libco/libco.h>
 
 #if defined(GAMEBOY)
-  #include <gameboy/gameboy.hpp>
+  #include <gb/gb.hpp>
 #endif
 
 namespace SNES {
-  struct Processor {
+  struct Thread {
     cothread_t thread;
     unsigned frequency;
     int64 clock;
@@ -41,10 +44,10 @@ namespace SNES {
       s.integer(clock);
     }
 
-    inline Processor() : thread(nullptr) {
+    inline Thread() : thread(nullptr) {
     }
 
-    inline ~Processor() {
+    inline ~Thread() {
       if(thread) co_delete(thread);
     }
   };

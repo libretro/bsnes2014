@@ -1,6 +1,7 @@
 #include <nes/nes.hpp>
-#include <gameboy/gameboy.hpp>
 #include <snes/snes.hpp>
+#include <gb/gb.hpp>
+#include <gba/gba.hpp>
 
 #include <nall/compositor.hpp>
 #include <nall/config.hpp>
@@ -10,8 +11,10 @@
 #include <nall/filemap.hpp>
 #include <nall/input.hpp>
 #include <nall/bps/patch.hpp>
+#include <nall/nes/cartridge.hpp>
 #include <nall/snes/cartridge.hpp>
-#include <nall/gameboy/cartridge.hpp>
+#include <nall/gb/cartridge.hpp>
+#include <nall/gba/cartridge.hpp>
 using namespace nall;
 
 #include <phoenix/phoenix.hpp>
@@ -34,6 +37,7 @@ struct Application {
   bool pause;
   bool autopause;
   bool compositionEnable;
+  unsigned depth;
 
   string basepath;
   string userpath;
@@ -43,6 +47,7 @@ struct Application {
   string normalFont;
   string boldFont;
   string titleFont;
+  string monospaceFont;
 
   void run();
   Application(int argc, char **argv);

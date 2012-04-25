@@ -1,7 +1,6 @@
 struct Config : public configuration {
   struct Video {
     string driver;
-    unsigned depth;
 
     string filter;
     string shader;
@@ -34,21 +33,14 @@ struct Config : public configuration {
     unsigned frequency;
     unsigned frequencyNES;
     unsigned frequencySNES;
-    unsigned frequencyGameBoy;
+    unsigned frequencyGB;
+    unsigned frequencyGBA;
   } audio;
 
   struct Input {
     string driver;
     unsigned focusPolicy;
   } input;
-
-  struct Path {
-    struct BIOS {
-      string satellaview;
-      string sufamiTurbo;
-      string superGameBoy;
-    } bios;
-  } path;
 
   struct NES {
     unsigned controllerPort1Device;

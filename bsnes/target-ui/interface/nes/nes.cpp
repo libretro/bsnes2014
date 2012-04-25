@@ -3,6 +3,10 @@ void InterfaceNES::initialize() {
   NES::system.init();
 }
 
+string InterfaceNES::markup() {
+  return NES::cartridge.information.markup;
+}
+
 void InterfaceNES::setController(bool port, unsigned device) {
   if(port == 0) config->nes.controllerPort1Device = device;
   if(port == 1) config->nes.controllerPort2Device = device;
@@ -29,24 +33,11 @@ bool InterfaceNES::loadCartridge(const string &filename) {
   unsigned size;
 
   if(filename.endswith("/")) {
-    if(file::exists({ filename, "program.rom" }) && file::exists({ filename, "character.rom" })) {
-      unsigned prgsize = file::size({ filename, "program.rom" });
-      unsigned chrsize = file::size({ filename, "character.rom" });
-      data = new uint8_t[size = prgsize + chrsize];
-      nall::file fp;
-      fp.open({ filename, "program.rom" }, file::mode::read);
-      fp.read(data, fp.size());
-      fp.close();
-      fp.open({ filename, "character.rom" }, file::mode::read);
-      fp.read(data + prgsize, fp.size());
-      fp.close();
-    } else {
-      return false;
-    }
-    interface->base = { true, filename };
+    if(file::read({filename, "program.rom"}, data, size) == false) return false;
+    interface->base = {true, filename};
   } else {
     file::read(filename, data, size);
-    interface->base = { false, nall::basename(filename) };
+    interface->base = {false, nall::basename(filename)};
   }
 
   interface->game = interface->base;
@@ -55,6 +46,7 @@ bool InterfaceNES::loadCartridge(const string &filename) {
 
   string markup;
   markup.readfile(interface->base.filename("manifest.xml", ".xml"));
+  if(markup.empty()) markup = FamicomCartridge(data, size).markup;
 
   NES::cartridge.load(markup, data, size);
   NES::system.power();
@@ -62,7 +54,7 @@ bool InterfaceNES::loadCartridge(const string &filename) {
 
   if(NES::cartridge.ram_size()) {
     filemap fp;
-    if(fp.open(interface->base.filename("program.ram", ".sav"), filemap::mode::read)) {
+    if(fp.open(interface->base.filename("save.ram", ".sav"), filemap::mode::read)) {
       memcpy(NES::cartridge.ram_data(), fp.data(), min(NES::cartridge.ram_size(), fp.size()));
     }
   }
@@ -74,7 +66,7 @@ bool InterfaceNES::loadCartridge(const string &filename) {
 
 void InterfaceNES::unloadCartridge() {
   if(NES::cartridge.ram_size()) {
-    file::write(interface->base.filename("program.ram", ".sav"), NES::cartridge.ram_data(), NES::cartridge.ram_size());
+    file::write(interface->base.filename("save.ram", ".sav"), NES::cartridge.ram_data(), NES::cartridge.ram_size());
   }
   NES::cartridge.unload();
   interface->base.name = "";

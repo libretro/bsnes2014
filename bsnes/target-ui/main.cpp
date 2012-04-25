@@ -6,9 +6,9 @@ nall::DSP dspaudio;
 //allow files to exist in the same folder as binary;
 //otherwise default to home folder
 string Application::path(const string &filename) {
-  string result = { basepath, filename };
+  string result = {basepath, filename};
   if(file::exists(result)) return result;
-  return { userpath, filename };
+  return {userpath, filename};
 }
 
 void Application::run() {
@@ -54,9 +54,11 @@ Application::Application(int argc, char **argv) {
   utility = new Utility;
 
   string fontFamily = Intrinsics::platform() == Intrinsics::Platform::Windows ? "Tahoma, " : "Sans, ";
-  normalFont = { fontFamily, "8" };
-  boldFont = { fontFamily, "8, Bold" };
-  titleFont = { fontFamily, "16, Bold" };
+  string monoFamily = Intrinsics::platform() == Intrinsics::Platform::Windows ? "Lucida Console, " : "Liberation Mono, ";
+  normalFont = {fontFamily, "8"};
+  boldFont = {fontFamily, "8, Bold"};
+  titleFont = {fontFamily, "16, Bold"};
+  monospaceFont = {monoFamily, "8"};
 
   compositionEnable = compositor::enabled();
   if(config->video.compositionMode == 2) compositor::enable(false);
@@ -64,8 +66,8 @@ Application::Application(int argc, char **argv) {
   windowManager = new WindowManager;
   mainWindow = new MainWindow;
   fileBrowser = new FileBrowser;
-  slotLoader = new SlotLoader;
   dipSwitches = new DipSwitches;
+  informationWindow = new InformationWindow;
   settingsWindow = new SettingsWindow;
   cheatDatabase = new CheatDatabase;
   cheatEditor = new CheatEditor;
@@ -78,12 +80,15 @@ Application::Application(int argc, char **argv) {
   video.driver(config->video.driver);
   video.set(Video::Handle, mainWindow->viewport.handle());
   video.set(Video::Synchronize, config->video.synchronize);
-  video.set(Video::Depth, config->video.depth);
+  if(!video.cap(Video::Depth) || !video.set(Video::Depth, depth = 30u)) {
+    video.set(Video::Depth, depth = 24u);
+  }
   if(video.init() == false) {
-    MessageWindow::critical(*mainWindow, { "Failed to initialize ", config->video.driver, " video driver." });
+    MessageWindow::critical(*mainWindow, {"Failed to initialize ", config->video.driver, " video driver."});
     video.driver("None");
     video.init();
   }
+  palette.update();
   utility->bindVideoFilter();
   utility->bindVideoShader();
 
@@ -93,7 +98,7 @@ Application::Application(int argc, char **argv) {
   audio.set(Audio::Latency, config->audio.latency);
   audio.set(Audio::Frequency, config->audio.frequency);
   if(audio.init() == false) {
-    MessageWindow::critical(*mainWindow, { "Failed to initialize ", config->audio.driver, " audio driver." });
+    MessageWindow::critical(*mainWindow, {"Failed to initialize ", config->audio.driver, " audio driver."});
     audio.driver("None");
     audio.init();
   }
@@ -107,7 +112,7 @@ Application::Application(int argc, char **argv) {
   input.driver(config->input.driver);
   input.set(Input::Handle, mainWindow->viewport.handle());
   if(input.init() == false) {
-    MessageWindow::critical(*mainWindow, { "Failed to initialize ", config->input.driver, " input driver." });
+    MessageWindow::critical(*mainWindow, {"Failed to initialize ", config->input.driver, " input driver."});
     input.driver("None");
     input.init();
   }
@@ -122,6 +127,7 @@ Application::Application(int argc, char **argv) {
 
   interface->unloadCartridge();
   windowManager->saveGeometry();
+  windowManager->hideAll();
   if(compositionEnable) compositor::enable(true);
 }
 
@@ -130,8 +136,8 @@ Application::~Application() {
   delete cheatEditor;
   delete cheatDatabase;
   delete settingsWindow;
+  delete informationWindow;
   delete dipSwitches;
-  delete slotLoader;
   delete fileBrowser;
   delete mainWindow;
   delete windowManager;

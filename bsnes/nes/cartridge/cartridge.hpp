@@ -1,7 +1,7 @@
 #include "chip/chip.hpp"
 #include "board/board.hpp"
 
-struct Cartridge : Processor, property<Cartridge> {
+struct Cartridge : Thread, property<Cartridge> {
   static void Main();
   void main();
 
@@ -16,6 +16,10 @@ struct Cartridge : Processor, property<Cartridge> {
 
   readonly<bool> loaded;
   readonly<string> sha256;
+
+  struct Information {
+    string markup;
+  } information;
 
   void serialize(serializer&);
   Cartridge();

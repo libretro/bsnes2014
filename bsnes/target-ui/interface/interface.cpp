@@ -1,8 +1,10 @@
 #include "../base.hpp"
+#include "core.cpp"
 #include "palette.cpp"
 #include "nes/nes.cpp"
 #include "snes/snes.cpp"
-#include "gameboy/gameboy.cpp"
+#include "gb/gb.cpp"
+#include "gba/gba.cpp"
 Interface *interface = nullptr;
 
 Filter filter;
@@ -36,7 +38,7 @@ string CartridgePath::title() const {
     title = notdir(nall::basename(title));
     return title;
   }
-  return notdir(nall::basename(name));
+  return notdir(name);
 }
 
 void Interface::bindControllers() {
@@ -71,29 +73,32 @@ void Interface::updateDSP() {
   dspaudio.setVolume(config->audio.mute == false ? (double)config->audio.volume / 100.0 : 0.0);
 
   switch(mode()) {
-  case Mode::NES:     return dspaudio.setFrequency(config->audio.frequencyNES);
-  case Mode::SNES:    return dspaudio.setFrequency(config->audio.frequencySNES);
-  case Mode::GameBoy: return dspaudio.setFrequency(config->audio.frequencyGameBoy);
+  case Mode::NES:  return dspaudio.setFrequency(config->audio.frequencyNES);
+  case Mode::SNES: return dspaudio.setFrequency(config->audio.frequencySNES);
+  case Mode::GB:   return dspaudio.setFrequency(config->audio.frequencyGB);
+  case Mode::GBA:  return dspaudio.setFrequency(config->audio.frequencyGBA);
   }
 }
 
+string Interface::markup() {
+  if(core) return core->markup();
+  return "";
+}
+
 bool Interface::cartridgeLoaded() {
-  switch(mode()) {
-  case Mode::NES:     return nes.cartridgeLoaded();
-  case Mode::SNES:    return snes.cartridgeLoaded();
-  case Mode::GameBoy: return gameBoy.cartridgeLoaded();
-  }
+  if(core) return core->cartridgeLoaded();
   return false;
 }
 
 void Interface::loadCartridge(Mode mode) {
-  utility->setMode(this->mode = mode);
   switch(mode) {
-  case Mode::NES: core = &nes; break;
+  case Mode::NES:  core = &nes; break;
   case Mode::SNES: core = &snes; break;
-  case Mode::GameBoy: core = &gameBoy; break;
-  default: core = nullptr; break;
+  case Mode::GB:   core = &gb; break;
+  case Mode::GBA:  core = &gba; break;
+  default:         core = nullptr; break;
   }
+  utility->setMode(this->mode = mode);
 
   bindControllers();
   cheatEditor->load(game.filename("cheats.xml", ".cht"));
@@ -102,12 +107,15 @@ void Interface::loadCartridge(Mode mode) {
   utility->showMessage({ "Loaded ", cartridgeTitle });
 }
 
-bool Interface::loadCartridge(const string &filename) {
+bool Interface::loadCartridge(string filename) {
+  filename.trim<1>("\"");
+  filename.transform("\\", "/");
   bool result = false;
-  if(filename.endswith(".nes")) result = nes.loadCartridge(filename);
-  if(filename.endswith(".sfc")) result = snes.loadCartridge(filename);
-  if(filename.endswith(".gb" )) result = gameBoy.loadCartridge(GameBoy::System::Revision::GameBoy, filename);
-  if(filename.endswith(".gbc")) result = gameBoy.loadCartridge(GameBoy::System::Revision::GameBoyColor, filename);
+  if(filename.endswith(".nes") || filename.endswith(".nes/")) result = nes.loadCartridge(filename);
+  if(filename.endswith(".sfc") || filename.endswith(".sfc/")) result = snes.loadCartridge(filename);
+  if(filename.endswith(".gb" ) || filename.endswith(".gb/" )) result = gb.loadCartridge(GB::System::Revision::GameBoy, filename);
+  if(filename.endswith(".gbc") || filename.endswith(".gbc/")) result = gb.loadCartridge(GB::System::Revision::GameBoyColor, filename);
+  if(filename.endswith(".gba") || filename.endswith(".gba/")) result = gba.loadCartridge(filename);
   return result;
 }
 
@@ -118,12 +126,8 @@ void Interface::unloadCartridge() {
   stateManager->save(game.filename("states.bsa", ".bsa"), 0u);
   setCheatCodes();
 
-  switch(mode()) {
-  case Mode::NES:     nes.unloadCartridge(); break;
-  case Mode::SNES:    snes.unloadCartridge(); break;
-  case Mode::GameBoy: gameBoy.unloadCartridge(); break;
-  }
-
+  if(core) core->unloadCartridge();
+  core = nullptr;
   cartridgeTitle = "";
   utility->setMode(mode = Mode::None);
 }
@@ -178,28 +182,25 @@ bool Interface::loadState(unsigned slot) {
 }
 
 void Interface::setCheatCodes(const lstring &list) {
-  switch(mode()) {
-  case Mode::NES:     return nes.setCheats(list);
-  case Mode::SNES:    return snes.setCheats(list);
-  case Mode::GameBoy: return gameBoy.setCheats(list);
-  }
+  if(core) return core->setCheats(list);
 }
 
 string Interface::sha256() {
   switch(mode()) {
-  case Mode::NES:     return NES::cartridge.sha256();
-  case Mode::SNES:    return SNES::cartridge.sha256();
-  case Mode::GameBoy: return GameBoy::cartridge.sha256();
+  case Mode::NES:  return NES::cartridge.sha256();
+  case Mode::SNES: return SNES::cartridge.sha256();
+  case Mode::GB:   return GB::cartridge.sha256();
+  case Mode::GBA:  return GBA::cartridge.sha256();
   }
   return "{None}";
 }
 
 Interface::Interface() : core(nullptr) {
   mode = Mode::None;
-  palette.update();
   nes.initialize();
   snes.initialize();
-  gameBoy.initialize();
+  gb.initialize();
+  gba.initialize();
 }
 
 //internal

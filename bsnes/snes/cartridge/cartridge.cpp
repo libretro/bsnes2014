@@ -11,8 +11,10 @@ namespace SNES {
 
 Cartridge cartridge;
 
-void Cartridge::load(Mode cartridge_mode, const char *markup) {
+void Cartridge::load(Mode cartridge_mode, const string &markup) {
   mode = cartridge_mode;
+  information.markup = markup;
+
   region = Region::NTSC;
   ram_size = 0;
 
@@ -38,7 +40,7 @@ void Cartridge::load(Mode cartridge_mode, const char *markup) {
 
   if(ram_size > 0) {
     ram.map(allocate<uint8>(ram_size, 0xff), ram_size);
-    nvram.append({ "program.ram", ram.data(), ram.size() });
+    nvram.append({ "save.ram", ram.data(), ram.size() });
   }
 
   rom.write_protect(true);
@@ -59,7 +61,7 @@ void Cartridge::load(Mode cartridge_mode, const char *markup) {
     break;
   case Mode::SuperGameBoy:
     #if defined(GAMEBOY)
-    sha256 = GameBoy::cartridge.sha256();
+    sha256 = GB::cartridge.sha256();
     #else
     throw "Game Boy support not present";
     #endif

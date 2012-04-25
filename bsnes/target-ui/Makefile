@@ -1,6 +1,10 @@
+processors := arm hg51b upd96050
+include processor/Makefile
+
 include $(nes)/Makefile
-include $(gameboy)/Makefile
 include $(snes)/Makefile
+include $(gb)/Makefile
+include $(gba)/Makefile
 name := bsnes
 
 ui_objects := ui-main ui-config ui-interface ui-input ui-utility
@@ -65,18 +69,23 @@ else
 endif
 
 install:
-ifeq ($(platform),x)
-	install -D -m 755 out/$(name) $(DESTDIR)$(prefix)/bin/$(name)
+ifeq ($(USER),root)
+	@echo Please do not run make install as root.
+	@echo The installer needs to know your home directory to install important files.
+else ifeq ($(platform),x)
+	sudo install -D -m 755 out/$(name) $(DESTDIR)$(prefix)/bin/$(name)
+	sudo install -D -m 644 data/$(name).png $(DESTDIR)$(prefix)/share/pixmaps/$(name).png
+	sudo install -D -m 644 data/$(name).desktop $(DESTDIR)$(prefix)/share/applications/$(name).desktop
+
 	mkdir -p ~/.config/$(name)
-	install -D -m 644 data/$(name).png $(DESTDIR)$(prefix)/share/pixmaps/$(name).png
-	install -D -m 644 data/$(name).desktop $(DESTDIR)$(prefix)/share/applications/$(name).desktop
+	cp -R profile/* ~/.config/$(name)
 	cp data/cheats.xml ~/.config/$(name)/cheats.xml
-	chmod 777 ~/.config/$(name) ~/.config/$(name)/cheats.xml
+	chmod -R 777 ~/.config/$(name)
 endif
 
 uninstall:
 ifeq ($(platform),x)
-	rm $(DESTDIR)$(prefix)/bin/$(name)
-	rm $(DESTDIR)$(prefix)/share/pixmaps/$(name).png
-	rm $(DESTDIR)$(prefix)/share/applications/$(name).desktop
+	sudo rm $(DESTDIR)$(prefix)/bin/$(name)
+	sudo rm $(DESTDIR)$(prefix)/share/pixmaps/$(name).png
+	sudo rm $(DESTDIR)$(prefix)/share/applications/$(name).desktop
 endif

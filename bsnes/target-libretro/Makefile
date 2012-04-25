@@ -1,5 +1,8 @@
+processors := arm hg51b upd96050
+include processor/Makefile
+
 include $(snes)/Makefile
-include $(gameboy)/Makefile
+include $(gb)/Makefile
 output := libretro
 
 ifeq ($(platform),x)
@@ -18,7 +21,7 @@ obj/libretro.o: $(ui)/libretro.cpp $(ui)/*
 #targets
 build: $(objects)
 ifeq ($(platform),x)
-	$(cpp) -o out/libretro.so -ldl -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
+	$(cpp) -o out/libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
 else ifeq ($(platform),osx)
 	$(cpp) -o out/libretro.dylib -dynamiclib $(objects)
 else ifeq ($(platform),win)

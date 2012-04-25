@@ -1,12 +1,20 @@
 #include "palette.hpp"
 
 struct InterfaceCore {
+  bool loadFirmware(string filename, string keyname, uint8_t *targetdata, unsigned targetsize);
+
+  virtual string markup() = 0;
+  virtual bool cartridgeLoaded() = 0;
+  virtual void unloadCartridge() = 0;
+
   virtual void power() = 0;
   virtual void reset() = 0;
   virtual void run() = 0;
 
   virtual serializer serialize() = 0;
   virtual bool unserialize(serializer&) = 0;
+
+  virtual void setCheats(const lstring &list = lstring{}) = 0;
 };
 
 struct CartridgePath {
@@ -18,7 +26,8 @@ struct CartridgePath {
 
 #include "nes/nes.hpp"
 #include "snes/snes.hpp"
-#include "gameboy/gameboy.hpp"
+#include "gb/gb.hpp"
+#include "gba/gba.hpp"
 
 struct Filter : public library {
   function<void (unsigned&, unsigned&)> dl_size;
@@ -36,16 +45,18 @@ struct Filter : public library {
 extern Filter filter;
 
 struct Interface : property<Interface> {
-  enum class Mode : unsigned { None, SNES, NES, GameBoy };
+  enum class Mode : unsigned { None, SNES, NES, GB, GBA };
   readonly<Mode> mode;
 
   void bindControllers();
   void setController(unsigned port, unsigned device);
   void updateDSP();
 
+  string markup();
+
   bool cartridgeLoaded();
   void loadCartridge(Mode mode);
-  bool loadCartridge(const string &filename);  //auto-detect system-type based on file extension
+  bool loadCartridge(string filename);  //auto-detect system-type based on file extension
   void unloadCartridge();
 
   void power();
@@ -73,7 +84,8 @@ struct Interface : property<Interface> {
   InterfaceCore *core;
   InterfaceNES nes;
   InterfaceSNES snes;
-  InterfaceGameBoy gameBoy;
+  InterfaceGB gb;
+  InterfaceGBA gba;
 };
 
 extern Interface *interface;

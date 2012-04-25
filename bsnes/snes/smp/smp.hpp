@@ -1,5 +1,5 @@
-struct SMP : public Processor, public SMPcore {
-  static const uint8 iplrom[64];
+struct SMP : Thread, public SMPcore {
+  uint8 iplrom[64];
   uint8 apuram[64 * 1024];
 
   enum : bool { Threaded = true };

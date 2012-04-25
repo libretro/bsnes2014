@@ -7,11 +7,11 @@ struct MainWindow : Window {
     Item cartridgeLoadNES;
     Item cartridgeLoadGameBoy;
     Item cartridgeLoadGameBoyColor;
+    Item cartridgeLoadGameBoyAdvance;
     Separator cartridgeSeparator;
-    Item cartridgeLoadSatellaviewSlotted;
+    Item cartridgeLoadSuperGameBoy;
     Item cartridgeLoadSatellaview;
     Item cartridgeLoadSufamiTurbo;
-    Item cartridgeLoadSuperGameBoy;
 
   Menu nesMenu;
     Item nesPower;
@@ -39,6 +39,11 @@ struct MainWindow : Window {
     Item gameBoyPower;
     Separator gameBoySeparator;
     Item gameBoyCartridgeUnload;
+
+  Menu gameBoyAdvanceMenu;
+    Item gameBoyAdvancePower;
+    Separator gameBoyAdvanceSeparator;
+    Item gameBoyAdvanceCartridgeUnload;
 
   Menu settingsMenu;
     Menu settingsVideoFilter;
@@ -74,6 +79,7 @@ struct MainWindow : Window {
       Item toolsStateLoad4;
       Item toolsStateLoad5;
     Separator toolsSeparator;
+    Item toolsInformationWindow;
     Item toolsShrinkWindow;
     Item toolsCheatEditor;
     Item toolsStateManager;
@@ -84,6 +90,7 @@ struct MainWindow : Window {
 private:
   lstring videoFilterName;
   lstring videoShaderName;
+  string filename;
 
   void setupVideoFilters();
   void setupVideoShaders();

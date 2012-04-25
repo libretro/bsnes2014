@@ -2,7 +2,7 @@
 #include <snes/snes.hpp>
 
 #include <nall/snes/cartridge.hpp>
-#include <nall/gameboy/cartridge.hpp>
+#include <nall/gb/cartridge.hpp>
 using namespace nall;
 
 struct Interface : public SNES::Interface {
@@ -95,18 +95,18 @@ struct Interface : public SNES::Interface {
 
   void setCheats(const lstring &list = lstring()) {
     if(SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy) {
-      GameBoy::cheat.reset();
+      GB::cheat.reset();
       for(auto &code : list) {
         lstring codelist;
         codelist.split("+", code);
         for(auto &part : codelist) {
           unsigned addr, data, comp;
-          if(GameBoy::Cheat::decode(part, addr, data, comp)) {
-            GameBoy::cheat.append({addr, data, comp});
+          if(GB::Cheat::decode(part, addr, data, comp)) {
+            GB::cheat.append({addr, data, comp});
           }
         }
       }
-      GameBoy::cheat.synchronize();
+      GB::cheat.synchronize();
       return;
     }
 
@@ -235,7 +235,7 @@ static bool snes_load_cartridge_normal(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size
 ) {
   if(rom_data) SNES::cartridge.rom.copy(rom_data, rom_size);
-  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SnesCartridge(rom_data, rom_size).markup;
+  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   SNES::cartridge.load(SNES::Cartridge::Mode::Normal, xmlrom);
   SNES::system.power();
   return true;
@@ -246,9 +246,9 @@ static bool snes_load_cartridge_bsx_slotted(
   const char *bsx_xml, const uint8_t *bsx_data, unsigned bsx_size
 ) {
   if(rom_data) SNES::cartridge.rom.copy(rom_data, rom_size);
-  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SnesCartridge(rom_data, rom_size).markup;
+  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   if(bsx_data) SNES::bsxflash.memory.copy(bsx_data, bsx_size);
-  string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SnesCartridge(bsx_data, bsx_size).markup;
+  string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SuperFamicomCartridge(bsx_data, bsx_size).markup;
   SNES::cartridge.load(SNES::Cartridge::Mode::BsxSlotted, xmlrom);
   SNES::system.power();
   return true;
@@ -259,9 +259,9 @@ static bool snes_load_cartridge_bsx(
   const char *bsx_xml, const uint8_t *bsx_data, unsigned bsx_size
 ) {
   if(rom_data) SNES::cartridge.rom.copy(rom_data, rom_size);
-  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SnesCartridge(rom_data, rom_size).markup;
+  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   if(bsx_data) SNES::bsxflash.memory.copy(bsx_data, bsx_size);
-  string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SnesCartridge(bsx_data, bsx_size).markup;
+  string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SuperFamicomCartridge(bsx_data, bsx_size).markup;
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx, xmlrom);
   SNES::system.power();
   return true;
@@ -273,11 +273,11 @@ static bool snes_load_cartridge_sufami_turbo(
   const char *stb_xml, const uint8_t *stb_data, unsigned stb_size
 ) {
   if(rom_data) SNES::cartridge.rom.copy(rom_data, rom_size);
-  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SnesCartridge(rom_data, rom_size).markup;
+  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   if(sta_data) SNES::sufamiturbo.slotA.rom.copy(sta_data, sta_size);
-  string xmlsta = (sta_xml && *sta_xml) ? string(sta_xml) : SnesCartridge(sta_data, sta_size).markup;
+  string xmlsta = (sta_xml && *sta_xml) ? string(sta_xml) : SuperFamicomCartridge(sta_data, sta_size).markup;
   if(stb_data) SNES::sufamiturbo.slotB.rom.copy(stb_data, stb_size);
-  string xmlstb = (stb_xml && *stb_xml) ? string(stb_xml) : SnesCartridge(stb_data, stb_size).markup;
+  string xmlstb = (stb_xml && *stb_xml) ? string(stb_xml) : SuperFamicomCartridge(stb_data, stb_size).markup;
   SNES::cartridge.load(SNES::Cartridge::Mode::SufamiTurbo, xmlrom);
   SNES::system.power();
   return true;
@@ -288,13 +288,13 @@ static bool snes_load_cartridge_super_game_boy(
   const char *dmg_xml, const uint8_t *dmg_data, unsigned dmg_size
 ) {
   if(rom_data) SNES::cartridge.rom.copy(rom_data, rom_size);
-  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SnesCartridge(rom_data, rom_size).markup;
+  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   if(dmg_data) {
     //GameBoyCartridge needs to modify dmg_data (for MMM01 emulation); so copy data
     uint8_t *data = new uint8_t[dmg_size];
     memcpy(data, dmg_data, dmg_size);
     string xmldmg = (dmg_xml && *dmg_xml) ? string(dmg_xml) : GameBoyCartridge(data, dmg_size).markup;
-    GameBoy::cartridge.load(GameBoy::System::Revision::SuperGameBoy, xmldmg, data, dmg_size);
+    GB::cartridge.load(GB::System::Revision::SuperGameBoy, xmldmg, data, dmg_size);
     delete[] data;
   }
   SNES::cartridge.load(SNES::Cartridge::Mode::SuperGameBoy, xmlrom);
@@ -380,7 +380,7 @@ void* retro_get_memory_data(unsigned id) {
       return SNES::sufamiturbo.slotB.ram.data();
     case RETRO_MEMORY_SNES_GAME_BOY_RAM:
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::SuperGameBoy) break;
-      return GameBoy::cartridge.ramdata;
+      return GB::cartridge.ramdata;
 
     case RETRO_MEMORY_SYSTEM_RAM:
       return SNES::cpu.wram;
@@ -418,7 +418,7 @@ size_t retro_get_memory_size(unsigned id) {
       break;
     case RETRO_MEMORY_SNES_GAME_BOY_RAM:
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::SuperGameBoy) break;
-      size = GameBoy::cartridge.ramsize;
+      size = GB::cartridge.ramsize;
       break;
 
     case RETRO_MEMORY_SYSTEM_RAM:

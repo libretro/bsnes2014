@@ -55,6 +55,6 @@ NesPort2Input::NesPort2Input() {
 //
 
 NesInput::NesInput() {
-  name = "NES";
-  append(port1, port1);
+  name = "Famicom";
+  append(port1, port2);
 }

@@ -6,17 +6,17 @@ MainWindow::MainWindow() {
   setBackgroundColor({ 0, 0, 0 });
   windowManager->append(this, "MainWindow");
 
-  cartridgeMenu.setText("&Cartridge");
-    cartridgeLoadSNES.setText("Load &SNES Cartridge ...");
-    cartridgeLoadNES.setText("Load &NES Cartridge ...");
-    cartridgeLoadGameBoy.setText("Load &Game Boy Cartridge ...");
-    cartridgeLoadGameBoyColor.setText("Load Game Boy &Color Cartridge ...");
-    cartridgeLoadSatellaviewSlotted.setText("Load Satellaview-Slotted Cartridge ...");
-    cartridgeLoadSatellaview.setText("Load Satellaview Cartridge ...");
-    cartridgeLoadSufamiTurbo.setText("Load Sufami Turbo Cartridge ...");
-    cartridgeLoadSuperGameBoy.setText("Load Super Game Boy Cartridge ...");
+  cartridgeMenu.setText("&Load");
+    cartridgeLoadNES.setText("&Famicom ...");
+    cartridgeLoadSNES.setText("&Super Famicom ...");
+    cartridgeLoadGameBoy.setText("&Game Boy ...");
+    cartridgeLoadGameBoyColor.setText("Game Boy &Color ...");
+    cartridgeLoadGameBoyAdvance.setText("Game Boy &Advance ...");
+    cartridgeLoadSuperGameBoy.setText("Super Game Boy ...");
+    cartridgeLoadSatellaview.setText("BS-X Satellaview ...");
+    cartridgeLoadSufamiTurbo.setText("Sufami Turbo ...");
 
-  nesMenu.setText("&NES");
+  nesMenu.setText("&Famicom");
     nesPower.setText("&Power Cycle");
     nesReset.setText("&Reset");
     nesPort1.setText("Controller Port &1");
@@ -31,7 +31,7 @@ MainWindow::MainWindow() {
       nesPort2Device[config->nes.controllerPort2Device].setChecked();
     nesCartridgeUnload.setText("&Unload Cartridge");
 
-  snesMenu.setText("&SNES");
+  snesMenu.setText("&Super Famicom");
     snesPower.setText("&Power Cycle");
     snesReset.setText("&Reset");
     snesPort1.setText("Controller Port &1");
@@ -60,6 +60,10 @@ MainWindow::MainWindow() {
   gameBoyMenu.setText("&Game Boy");
     gameBoyPower.setText("&Power Cycle");
     gameBoyCartridgeUnload.setText("&Unload Cartridge");
+
+  gameBoyAdvanceMenu.setText("&Game Boy Advance");
+    gameBoyAdvancePower.setText("&Power Cycle");
+    gameBoyAdvanceCartridgeUnload.setText("&Unload Cartridge");
 
   settingsMenu.setText("S&ettings");
     settingsVideoFilter.setText("Video &Filter");
@@ -94,6 +98,7 @@ MainWindow::MainWindow() {
       toolsStateLoad3.setText("Slot &3");
       toolsStateLoad4.setText("Slot &4");
       toolsStateLoad5.setText("Slot &5");
+    toolsInformationWindow.setText("&Information ...");
     toolsShrinkWindow.setText("Shrink &Window");
     toolsCheatEditor.setText("&Cheat Editor ...");
     toolsStateManager.setText("State &Manager ...");
@@ -103,11 +108,11 @@ MainWindow::MainWindow() {
     cartridgeMenu.append(cartridgeLoadSNES);
     cartridgeMenu.append(cartridgeLoadGameBoy);
     cartridgeMenu.append(cartridgeLoadGameBoyColor);
+    cartridgeMenu.append(cartridgeLoadGameBoyAdvance);
     cartridgeMenu.append(cartridgeSeparator);
-    cartridgeMenu.append(cartridgeLoadSatellaviewSlotted);
+    cartridgeMenu.append(cartridgeLoadSuperGameBoy);
     cartridgeMenu.append(cartridgeLoadSatellaview);
     cartridgeMenu.append(cartridgeLoadSufamiTurbo);
-    cartridgeMenu.append(cartridgeLoadSuperGameBoy);
 
   append(nesMenu);
     nesMenu.append(nesPower);
@@ -137,6 +142,11 @@ MainWindow::MainWindow() {
     gameBoyMenu.append(gameBoyPower);
     gameBoyMenu.append(gameBoySeparator);
     gameBoyMenu.append(gameBoyCartridgeUnload);
+
+  append(gameBoyAdvanceMenu);
+    gameBoyAdvanceMenu.append(gameBoyAdvancePower);
+    gameBoyAdvanceMenu.append(gameBoyAdvanceSeparator);
+    gameBoyAdvanceMenu.append(gameBoyAdvanceCartridgeUnload);
 
   append(settingsMenu);
     settingsMenu.append(settingsVideoFilter);
@@ -176,6 +186,7 @@ MainWindow::MainWindow() {
       toolsStateLoad.append(toolsStateLoad4);
       toolsStateLoad.append(toolsStateLoad5);
     toolsMenu.append(toolsSeparator);
+    toolsMenu.append(toolsInformationWindow);
     toolsMenu.append(toolsShrinkWindow);
     toolsMenu.append(toolsCheatEditor);
     toolsMenu.append(toolsStateManager);
@@ -192,33 +203,78 @@ MainWindow::MainWindow() {
   onSize = [&] { utility->resizeMainWindow(); };
 
   cartridgeLoadNES.onActivate = [&] {
-    fileBrowser->open("Load Cartridge - NES", FileBrowser::Mode::NES, [](string filename) {
+    fileBrowser->open("Load Cartridge - Famicom", FileBrowser::Mode::NES, [](string filename) {
       interface->nes.loadCartridge(filename);
     });
   };
 
   cartridgeLoadSNES.onActivate = [&] {
-    fileBrowser->open("Load Cartridge - SNES", FileBrowser::Mode::SNES, [](string filename) {
-      interface->snes.loadCartridge(filename);
+    fileBrowser->open("Load Cartridge - Super Famicom", FileBrowser::Mode::SNES, [](string filename) {
+      string filedata;
+      filedata.readfile({dir(filename),"manifest.xml"});
+      XML::Document document(filedata);
+      if(document["cartridge"]["bsx"]["slot"].exists()
+      && MessageWindow::question(*mainWindow, "Load BS-X Satellaview data pack?") == MessageWindow::Response::Yes) {
+        mainWindow->filename = filename;
+        fileBrowser->open("Load Cartridge - BS-X Satellaview", FileBrowser::Mode::Satellaview, [](string filename) {
+          interface->snes.loadSatellaviewSlottedCartridge(mainWindow->filename, filename);
+        });
+      } else {
+        interface->snes.loadCartridge(filename);
+      }
     });
   };
 
   cartridgeLoadGameBoy.onActivate = [&] {
     fileBrowser->open("Load Cartridge - Game Boy", FileBrowser::Mode::GameBoy, [](string filename) {
-      interface->gameBoy.loadCartridge(GameBoy::System::Revision::GameBoy, filename);
+      interface->gb.loadCartridge(GB::System::Revision::GameBoy, filename);
     });
   };
 
   cartridgeLoadGameBoyColor.onActivate = [&] {
     fileBrowser->open("Load Cartridge - Game Boy Color", FileBrowser::Mode::GameBoyColor, [](string filename) {
-      interface->gameBoy.loadCartridge(GameBoy::System::Revision::GameBoyColor, filename);
+      interface->gb.loadCartridge(GB::System::Revision::GameBoyColor, filename);
     });
   };
 
-  cartridgeLoadSatellaviewSlotted.onActivate = [&] { slotLoader->loadSatellaviewSlotted(); };
-  cartridgeLoadSatellaview.onActivate        = [&] { slotLoader->loadSatellaview(); };
-  cartridgeLoadSufamiTurbo.onActivate        = [&] { slotLoader->loadSufamiTurbo(); };
-  cartridgeLoadSuperGameBoy.onActivate       = [&] { slotLoader->loadSuperGameBoy(); };
+  cartridgeLoadGameBoyAdvance.onActivate = [&] {
+    fileBrowser->open("Load Cartridge - Game Boy Advance", FileBrowser::Mode::GameBoyAdvance, [](string filename) {
+      interface->gba.loadCartridge(filename);
+    });
+  };
+
+  cartridgeLoadSuperGameBoy.onActivate = [&] {
+    fileBrowser->open("Load Cartridge - Super Game Boy", FileBrowser::Mode::GameBoy, [](string filename) {
+      interface->snes.loadSuperGameBoyCartridge(application->path("Super Game Boy.sfc/"), filename);
+    });
+  };
+
+  cartridgeLoadSatellaview.onActivate = [&] {
+    fileBrowser->open("Load Cartridge - BS-X Satellaview", FileBrowser::Mode::Satellaview, [](string filename) {
+      interface->snes.loadSatellaviewCartridge(application->path("BS-X Satellaview.sfc/"), filename);
+    });
+  };
+
+  cartridgeLoadSufamiTurbo.onActivate = [&] {
+    fileBrowser->open("Load Cartridge - Sufami Turbo", FileBrowser::Mode::SufamiTurbo, [](string filename) {
+      string filedata;
+      filedata.readfile({dir(filename),"manifest.xml"});
+      XML::Document document(filedata);
+      if(document["cartridge"]["linkable"].data == "true"
+      && MessageWindow::question(*mainWindow, "Load linkable cartridge?") == MessageWindow::Response::Yes) {
+        mainWindow->filename = filename;
+        fileBrowser->open("Load Cartridge - Sufami Turbo", FileBrowser::Mode::SufamiTurbo, [](string filename) {
+          if(mainWindow->filename == filename) {
+            MessageWindow::critical(*mainWindow, "It is physically impossible to have the same cartridge in two slots at the same time.");
+          } else {
+            interface->snes.loadSufamiTurboCartridge(application->path("Sufami Turbo.sfc/"), mainWindow->filename, filename);
+          }
+        });
+      } else {
+        interface->snes.loadSufamiTurboCartridge(application->path("Sufami Turbo.sfc/"), filename, "");
+      }
+    });
+  };
 
   nesPower.onActivate = { &Interface::power, interface };
   nesReset.onActivate = { &Interface::reset, interface };
@@ -253,6 +309,9 @@ MainWindow::MainWindow() {
 
   gameBoyPower.onActivate = { &Interface::power, interface };
   gameBoyCartridgeUnload.onActivate = { &Interface::unloadCartridge, interface };
+
+  gameBoyAdvancePower.onActivate = { &Interface::power, interface };
+  gameBoyAdvanceCartridgeUnload.onActivate = { &Interface::unloadCartridge, interface };
 
   settingsVideoFilterNone.onActivate = [&] {
     config->video.filter = "None";
@@ -307,6 +366,7 @@ MainWindow::MainWindow() {
   toolsStateLoad4.onActivate = [&] { interface->loadState(4); };
   toolsStateLoad5.onActivate = [&] { interface->loadState(5); };
 
+  toolsInformationWindow.onActivate = [&] { informationWindow->setVisible(); };
   toolsShrinkWindow.onActivate = [&] { utility->resizeMainWindow(true); };
   toolsCheatEditor.onActivate = [&] { cheatEditor->setVisible(); };
   toolsStateManager.onActivate = [&] { stateManager->setVisible(); };
