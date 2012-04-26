@@ -384,6 +384,8 @@ void* retro_get_memory_data(unsigned id) {
 
     case RETRO_MEMORY_SYSTEM_RAM:
       return SNES::cpu.wram;
+    case RETRO_MEMORY_VIDEO_RAM:
+      return SNES::ppu.vram;
   }
 
   return 0;
@@ -423,6 +425,9 @@ size_t retro_get_memory_size(unsigned id) {
 
     case RETRO_MEMORY_SYSTEM_RAM:
       size = 128 * 1024;
+      break;
+    case RETRO_MEMORY_VIDEO_RAM:
+      size = 64 * 1024;
       break;
   }
 
