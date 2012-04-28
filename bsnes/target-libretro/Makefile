@@ -25,7 +25,7 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
 	$(cpp) -o out/libretro.dylib -dynamiclib $(objects)
 else ifeq ($(platform),win)
-	$(cpp) -o out/retro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
+	$(cpp) -o out/retro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T -static-libgcc -static-libstdc++
 endif
 
 install:
