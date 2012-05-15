@@ -1,8 +1,8 @@
-processors := arm hg51b upd96050
+processors := arm hg51b upd96050 gsu r65816 spc700 lr35902
 include processor/Makefile
 
-include $(snes)/Makefile
-include $(gb)/Makefile
+include sfc/Makefile
+include gb/Makefile
 output := libretro
 
 ifeq ($(platform),x)
@@ -13,7 +13,7 @@ else ifeq ($(platform),win)
 endif
 
 #rules
-objects := $(objects) libretro
+objects += libretro
 objects := $(patsubst %,obj/%.o,$(objects))
 
 obj/libretro.o: $(ui)/libretro.cpp $(ui)/*

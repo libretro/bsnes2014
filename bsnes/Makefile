@@ -13,7 +13,13 @@ target  := ethos
 # compiler
 c       := $(compiler) -std=gnu99
 cpp     := $(subst cc,++,$(compiler)) -std=gnu++0x
-flags   := -I. -O3 -fomit-frame-pointer
+
+ifneq ($(debug),)
+  flags := -I. -O0 -g
+else
+  flags   := -I. -O3 -fomit-frame-pointer
+endif
+
 link    := -s
 objects := libco
 
