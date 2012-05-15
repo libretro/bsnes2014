@@ -36,7 +36,7 @@ struct pDesktop {
 
 struct pKeyboard {
   static bool pressed(Keyboard::Scancode scancode);
-  static array<bool> state();
+  static vector<bool> state();
 
   static void initialize();
 };
@@ -119,6 +119,7 @@ struct pWindow : public pObject {
   void setGeometry(const Geometry &geometry);
   void setMenuFont(const string &font);
   void setMenuVisible(bool visible);
+  void setModal(bool modal);
   void setResizable(bool resizable);
   void setStatusFont(const string &font);
   void setStatusText(const string &text);
@@ -202,7 +203,7 @@ struct pRadioItem : public pAction {
 
   bool checked();
   void setChecked();
-  void setGroup(const array<RadioItem&> &group);
+  void setGroup(const set<RadioItem&> &group);
   void setText(const string &text);
 
   pRadioItem(RadioItem &radioItem) : pAction(radioItem), radioItem(radioItem) {}
@@ -428,7 +429,7 @@ struct pRadioBox : public pWidget {
   bool checked();
   Geometry minimumGeometry();
   void setChecked();
-  void setGroup(const array<RadioBox&> &group);
+  void setGroup(const set<RadioBox&> &group);
   void setText(const string &text);
 
   pRadioBox(RadioBox &radioBox) : pWidget(radioBox), radioBox(radioBox) {}

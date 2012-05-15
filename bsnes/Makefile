@@ -1,12 +1,12 @@
 include nall/Makefile
 
-nes  := nes
-snes := snes
-gb   := gb
-gba  := gba
+fc  := fc
+sfc := sfc
+gb  := gb
+gba := gba
 
 profile := accuracy
-target  := ui
+target  := ethos
 
 # options += console
 

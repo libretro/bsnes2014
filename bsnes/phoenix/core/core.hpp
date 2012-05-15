@@ -91,7 +91,7 @@ struct Keyboard {
   #include "keyboard.hpp"
   static bool pressed(Scancode scancode);
   static bool released(Scancode scancode);
-  static nall::array<bool> state();
+  static nall::vector<bool> state();
   Keyboard() = delete;
 };
 
@@ -199,6 +199,7 @@ struct Window : private nall::base_from_member<pWindow&>, Object {
   void setGeometry(const Geometry &geometry);
   void setMenuFont(const nall::string &font);
   void setMenuVisible(bool visible = true);
+  void setModal(bool modal = true);
   void setResizable(bool resizable = true);
   void setStatusFont(const nall::string &font);
   void setStatusText(const nall::string &text);
@@ -234,8 +235,8 @@ struct Menu : private nall::base_from_member<pMenu&>, Action {
   template<typename... Args> void append(Args&... args) { append({ args... }); }
   template<typename... Args> void remove(Args&... args) { remove({ args... }); }
 
-  void append(const nall::array<Action&> &list);
-  void remove(const nall::array<Action&> &list);
+  void append(const nall::set<Action&> &list);
+  void remove(const nall::set<Action&> &list);
   void setImage(const nall::image &image);
   void setText(const nall::string &text);
 
@@ -281,13 +282,14 @@ struct CheckItem : private nall::base_from_member<pCheckItem&>, Action {
 
 struct RadioItem : private nall::base_from_member<pRadioItem&>, Action {
   template<typename... Args> static void group(Args&... args) { group({ args... }); }
-  static void group(const nall::array<RadioItem&> &list);
+  static void group(const nall::set<RadioItem&> &list);
 
   nall::function<void ()> onActivate;
 
   bool checked();
   void setChecked();
   void setText(const nall::string &text);
+  nall::string text();
 
   RadioItem();
   ~RadioItem();
@@ -402,6 +404,8 @@ struct ComboBox : private nall::base_from_member<pComboBox&>, Widget {
   void reset();
   unsigned selection();
   void setSelection(unsigned row);
+  nall::string text();
+  nall::string text(unsigned row);
 
   ComboBox();
   ~ComboBox();
@@ -524,7 +528,7 @@ struct ProgressBar : private nall::base_from_member<pProgressBar&>, Widget {
 
 struct RadioBox : private nall::base_from_member<pRadioBox&>, Widget {
   template<typename... Args> static void group(Args&... args) { group({ args... }); }
-  static void group(const nall::array<RadioBox&> &list);
+  static void group(const nall::set<RadioBox&> &list);
 
   nall::function<void ()> onActivate;
 

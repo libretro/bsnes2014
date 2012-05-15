@@ -1,18 +1,20 @@
 #include <gba/gba.hpp>
 
-namespace GBA {
+namespace GameBoyAdvance {
 
 #include "eeprom.cpp"
 #include "flashrom.cpp"
 #include "serialization.cpp"
 Cartridge cartridge;
 
-bool Cartridge::load(const string &markup, const uint8_t *data, unsigned size) {
+bool Cartridge::load(const string &markup, const stream &memory) {
   information.markup = markup;
   XML::Document document(markup);
 
-  for(unsigned addr = 0; addr < rom.size; addr++) {
-    rom.data[addr] = data[Bus::mirror(addr, size)];
+  unsigned size = memory.size();
+  memory.read(rom.data, min(rom.size, size));
+  for(unsigned addr = size; addr < rom.size; addr++) {
+    rom.data[addr] = rom.data[Bus::mirror(addr, size)];
   }
 
   has_sram     = false;
@@ -27,6 +29,8 @@ bool Cartridge::load(const string &markup, const uint8_t *data, unsigned size) {
       ram.size = numeral(info["size"].data);
       ram.mask = ram.size - 1;
       for(unsigned n = 0; n < ram.size; n++) ram.data[n] = 0xff;
+
+      interface->memory.append({2, "save.ram"});
     }
 
     if(info["type"].data == "EEPROM") {
@@ -37,6 +41,8 @@ bool Cartridge::load(const string &markup, const uint8_t *data, unsigned size) {
       eeprom.mask = size > 16 * 1024 * 1024 ? 0x0fffff00 : 0x0f000000;
       eeprom.test = size > 16 * 1024 * 1024 ? 0x0dffff00 : 0x0d000000;
       for(unsigned n = 0; n < eeprom.size; n++) eeprom.data[n] = 0xff;
+
+      interface->memory.append({3, "save.ram"});
     }
 
     if(info["type"].data == "FlashROM") {
@@ -44,10 +50,12 @@ bool Cartridge::load(const string &markup, const uint8_t *data, unsigned size) {
       flashrom.id = numeral(info["id"].data);
       flashrom.size = numeral(info["size"].data);
       for(unsigned n = 0; n < flashrom.size; n++) flashrom.data[n] = 0xff;
+
+      interface->memory.append({4, "save.ram"});
     }
   }
 
-  sha256 = nall::sha256(rom.data, rom.size);
+  sha256 = nall::sha256(rom.data, size);
 
   system.load();
   return loaded = true;
@@ -98,18 +106,42 @@ void Cartridge::write(uint8 *data, uint32 addr, uint32 size, uint32 word) {
   }
 }
 
+#define RAM_ANALYZE
+
 uint32 Cartridge::read(uint32 addr, uint32 size) {
+  #ifdef RAM_ANALYZE
+  if((addr & 0x0e000000) == 0x0e000000) {
+    static bool once = true;
+    if(once) once = false, print("* SRAM/FlashROM read detected\n");
+  }
+  #endif
+
   if(has_sram     && (addr & 0x0e000000 ) == 0x0e000000 ) return read(ram.data, addr & ram.mask, size);
   if(has_eeprom   && (addr & eeprom.mask) == eeprom.test) return eeprom.read();
-  if(has_flashrom && (addr & 0x0f000000 ) == 0x0e000000 ) return flashrom.read(addr);
+  if(has_flashrom && (addr & 0x0e000000 ) == 0x0e000000 ) return flashrom.read(addr);
   if(addr < 0x0e000000) return read(rom.data, addr & 0x01ffffff, size);
   return cpu.pipeline.fetch.instruction;
 }
 
 void Cartridge::write(uint32 addr, uint32 size, uint32 word) {
+  #ifdef RAM_ANALYZE
+  if((addr & 0x0e000000) == 0x0e000000) {
+    static bool once = true;
+    if(once) once = false, print("* SRAM/FlashROM write detected\n");
+  }
+  if((addr & 0x0f000000) == 0x0d000000) {
+    static bool once = true;
+    if(once) once = false, print("* EEPROM write detected\n");
+  }
+  if((addr & 0x0e00ffff) == 0x0e005555 && (word & 0xff) == 0xaa) {
+    static bool once = true;
+    if(once) once = false, print("* FlashROM write detected\n");
+  }
+  #endif
+
   if(has_sram     && (addr & 0x0e000000 ) == 0x0e000000 ) return write(ram.data, addr & ram.mask, size, word);
   if(has_eeprom   && (addr & eeprom.mask) == eeprom.test) return eeprom.write(word & 1);
-  if(has_flashrom && (addr & 0x0f000000 ) == 0x0e000000 ) return flashrom.write(addr, word);
+  if(has_flashrom && (addr & 0x0e000000 ) == 0x0e000000 ) return flashrom.write(addr, word);
 }
 
 Cartridge::Cartridge() {

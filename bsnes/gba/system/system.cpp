@@ -1,6 +1,6 @@
 #include <gba/gba.hpp>
 
-namespace GBA {
+namespace GameBoyAdvance {
 
 #include "bios.cpp"
 #include "serialization.cpp"
@@ -31,7 +31,7 @@ void System::run() {
     scheduler.enter();
     if(scheduler.exit_reason() == Scheduler::ExitReason::FrameEvent) break;
   }
-  interface->videoRefresh(ppu.output);
+  interface->videoRefresh(ppu.output, 4 * 240, 240, 160);
 }
 
 void System::runtosave() {
@@ -53,7 +53,9 @@ void System::runthreadtosave() {
   while(true) {
     scheduler.enter();
     if(scheduler.exit_reason() == Scheduler::ExitReason::SynchronizeEvent) break;
-    if(scheduler.exit_reason() == Scheduler::ExitReason::FrameEvent) interface->videoRefresh(ppu.output);
+    if(scheduler.exit_reason() == Scheduler::ExitReason::FrameEvent) {
+      interface->videoRefresh(ppu.output, 4 * 240, 240, 160);
+    }
   }
 }
 

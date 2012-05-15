@@ -10,7 +10,7 @@
 //vblank:    68 scanlines ( 83776 cycles)
 //frame:    228 scanlines (280896 cycles)
 
-namespace GBA {
+namespace GameBoyAdvance {
 
 #include "registers.cpp"
 #include "background.cpp"
@@ -153,7 +153,7 @@ void PPU::frame() {
 }
 
 PPU::PPU() {
-  output = new uint16[240 * 160];
+  output = new uint32[240 * 160];
   blur = new uint16[240 * 160];
 
   regs.bg[0].id = BG0;
