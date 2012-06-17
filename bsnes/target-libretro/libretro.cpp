@@ -89,13 +89,12 @@ struct Callbacks : Emulator::Interface::Bind {
     pitch >>= 2;
 
     if (!overscan) {
-      if (height == 240) {
-        data += 8 * pitch;
-        height -= 16;
-      } else {
-        data += 16 * pitch;
-        height -= 32;
-      }
+      data += 7 * 1024;
+
+      if (height == 240)
+        height = 224;
+      else if (height == 480)
+        height = 448;
     }
 
     uint16_t *dp = buffer;
