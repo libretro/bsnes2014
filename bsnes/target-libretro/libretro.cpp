@@ -144,7 +144,16 @@ struct Interface : public SuperFamicom::Interface {
   }
 };
 
+struct GBInterface : public GameBoy::Interface {
+  GBInterface() { bind = &core_bind; }
+  void init() {
+    updatePalette();
+  }
+};
+
+
 static Interface core_interface;
+static GBInterface core_gb_interface;
 
 void Interface::setCheats(const lstring &list) {
   if(core_interface.mode == SuperFamicomCartridge::ModeSuperGameBoy) {
@@ -196,6 +205,8 @@ void retro_set_controller_port_device(unsigned port, unsigned device) {
 
 void retro_init(void) {
   SuperFamicom::interface = &core_interface;
+  GameBoy::interface = &core_gb_interface;
+
   core_interface.init();
 
   memcpy(SuperFamicom::smp.iplrom, iplrom, 64);
