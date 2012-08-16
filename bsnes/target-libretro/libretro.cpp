@@ -3,6 +3,7 @@
 
 #include <nall/snes/cartridge.hpp>
 #include <nall/gb/cartridge.hpp>
+#include <nall/stream/mmap.hpp>
 using namespace nall;
 
 const uint8 iplrom[64] = {
@@ -48,6 +49,8 @@ struct Callbacks : Emulator::Interface::Bind {
   retro_input_state_t pinput_state;
   retro_environment_t penviron;
   bool overscan;
+
+  Emulator::Interface *iface;
 
   string basename;
   uint16_t buffer[512 * 448];
@@ -118,8 +121,19 @@ struct Callbacks : Emulator::Interface::Bind {
     return pinput_state(port, snes_to_retro(device), 0, snes_to_retro(device, id));
   }
 
-  string path(const string &hint) {
-    return string(basename, hint);
+  void loadRequest(unsigned id, const string &p) {
+    string load_path = {path(0), p};
+    fprintf(stderr, "bsnes: Load_path: %s\n", (const char*)load_path);
+    if(file::exists(load_path)) {
+      mmapstream stream(load_path);
+      iface->load(id, stream);
+    } else {
+      fprintf(stderr, "bsnes: Cannot find path: \"%s\".\n", (const char*)load_path);
+    }
+  }
+
+  string path(unsigned) {
+    return string(basename);
   }
 
   uint32_t videoColor(unsigned, uint16_t r, uint16_t g, uint16_t b) {
@@ -137,7 +151,7 @@ struct Interface : public SuperFamicom::Interface {
 
   void setCheats(const lstring &list = lstring());
 
-  Interface() { bind = &core_bind; }
+  Interface(); 
 
   void init() {
     updatePalette();
@@ -151,9 +165,13 @@ struct GBInterface : public GameBoy::Interface {
   }
 };
 
-
 static Interface core_interface;
 static GBInterface core_gb_interface;
+
+Interface::Interface() {
+  bind = &core_bind;
+  core_bind.iface = &core_interface;
+}
 
 void Interface::setCheats(const lstring &list) {
   if(core_interface.mode == SuperFamicomCartridge::ModeSuperGameBoy) {
@@ -370,9 +388,12 @@ bool retro_load_game(const struct retro_game_info *info) {
   retro_cheat_reset();
   if (info->path) {
     core_bind.basename = info->path;
-    char *dot = strrchr(core_bind.basename(), '.');
+    char *dot = strrchr(core_bind.basename(), '/');
+    if (!dot)
+       dot = strrchr(core_bind.basename(), '\\');
+
     if (dot)
-       *dot = '\0';
+       dot[1] = '\0';
   }
 
   core_interface.mode = SuperFamicomCartridge::ModeNormal;
