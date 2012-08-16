@@ -92,7 +92,7 @@ struct Callbacks : Emulator::Interface::Bind {
     pitch >>= 2;
 
     if (!overscan) {
-      data += 7 * 1024;
+      data += 8 * 1024;
 
       if (height == 240)
         height = 224;
