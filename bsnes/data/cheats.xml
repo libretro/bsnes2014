@@ -571,7 +571,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="22e92af92aed2d8d7bddb60732963642788b3ea9341592ce2c66a542a3d7ce7d">
-    <name>Advanced Dungeons \&amp; Dragons - DragonStrike (USA)</name>
+    <name>Advanced Dungeons &amp; Dragons - DragonStrike (USA)</name>
     <cheat>
       <description>Invincibility</description>
       <code>ATGGNY</code>
@@ -630,14 +630,14 @@
     </cheat>
   </cartridge>
   <cartridge sha256="df2609c80e818bb95983b30a3ac1435ea2332ac83e29fde469f397e1d5a2db93">
-    <name>Advanced Dungeons \&amp; Dragons - Heroes of the Lance (USA)</name>
+    <name>Advanced Dungeons &amp; Dragons - Heroes of the Lance (USA)</name>
     <cheat>
       <description>Infinite HP for party in most battles</description>
       <code>SUOAZGSP</code>
     </cheat>
   </cartridge>
   <cartridge sha256="60061c0042741f7c1e53ad8f738c27ffd9057310ff5d556662b3667e5700e751">
-    <name>Advanced Dungeons \&amp; Dragons - Hillsfar (USA)</name>
+    <name>Advanced Dungeons &amp; Dragons - Hillsfar (USA)</name>
     <cheat>
       <description>Infinite Knock Rings</description>
       <code>SXKUTSVK+AEKUISAI</code>
@@ -668,7 +668,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="38e5253131d264395a302d0910316f94bec00f60db616caa7a53806f08c5b5f9">
-    <name>Advanced Dungeons \&amp; Dragons - Pool of Radiance (USA)</name>
+    <name>Advanced Dungeons &amp; Dragons - Pool of Radiance (USA)</name>
     <cheat>
       <description>Create super characters</description>
       <code>SOLAUN</code>
@@ -2856,7 +2856,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="b265adba4a6f751f4da7b157672f324264f11fed3ca0b1e4ca703eb0b8a5ab77">
-    <name>Back to the Future Part II \&amp; III (USA)</name>
+    <name>Back to the Future Part II &amp; III (USA)</name>
     <cheat>
       <description>Infinite lives</description>
       <code>SXXELOVK</code>
@@ -4315,7 +4315,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="b183c0952994cadc1c8d6dd290730f43ecacb051d3dfe53784578635a1049455">
-    <name>Bill \&amp; Ted's Excellent Video Game Adventure (USA)</name>
+    <name>Bill &amp; Ted's Excellent Video Game Adventure (USA)</name>
     <cheat>
       <description>Infinite skeleton keys</description>
       <code>SZKUPXVK</code>
@@ -11781,7 +11781,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="6f23f245b9edc5af0c07fab9e12f5c0571ea0f52413e4ce6ad36e2f57ddf4097">
-    <name>Faria - A World of Mystery \&amp; Danger! (USA)</name>
+    <name>Faria - A World of Mystery &amp; Danger! (USA)</name>
     <cheat>
       <description>Infinite HP</description>
       <code>SAOEGPST+SEUUEAST</code>
@@ -12827,7 +12827,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="3036a59bb7bf16a3b80c94750bccaa35be9ab5cd94f99d68d3979ec53cd42c03">
-    <name>Flintstones, The - The Rescue of Dino \&amp; Hoppy (USA)</name>
+    <name>Flintstones, The - The Rescue of Dino &amp; Hoppy (USA)</name>
     <cheat>
       <description>Invincibility</description>
       <code>AVOPZOVG</code>
@@ -13124,7 +13124,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="e9fe69c87a9ab1183ce8492843bacf868e1f8df2fd4e1441403091d13025a619">
-    <name>Fox's Peter Pan \&amp; the Pirates - The Revenge of Captain Hook (USA)</name>
+    <name>Fox's Peter Pan &amp; the Pirates - The Revenge of Captain Hook (USA)</name>
     <cheat>
       <description>Infinite lives</description>
       <code>SZOKYLVG</code>
@@ -16892,7 +16892,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="aab5e0ecc46e575b1b396bd63d8fa4f3bd740061f3157a1d4afdf9f7f2dabd88">
-    <name>IronSword - Wizards \&amp; Warriors II (USA)</name>
+    <name>IronSword - Wizards &amp; Warriors II (USA)</name>
     <cheat>
       <description>Infinite lives</description>
       <code>OXXANAVK</code>
@@ -17595,7 +17595,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="509f04b745d11b8d83afb42f084179a6f2ebc87f647927432a647f0e7ee51bb5">
-    <name>Joe \&amp; Mac (USA)</name>
+    <name>Joe &amp; Mac (USA)</name>
     <cheat>
       <description>Invincibility</description>
       <code>ESXIZTEY+ENXSGTEI</code>
@@ -17698,7 +17698,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="ec54ed32302aaeb2fa6e0d7e2ca3ea2d8df888e77859e158298ecb2fa322178e">
-    <name>Joshua \&amp; the Battle of Jericho (USA) (v6.0) (Unl)</name>
+    <name>Joshua &amp; the Battle of Jericho (USA) (v6.0) (Unl)</name>
     <cheat>
       <description>Exit always open</description>
       <code>075F:05+003F:FF</code>
@@ -17713,7 +17713,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="5b7afe0ff1fcf538fec60d085aa759522a2ab1cce511a6f210b672a256a87a8a">
-    <name>Joshua \&amp; the Battle of Jericho (USA) (v5.0) (Unl)</name>
+    <name>Joshua &amp; the Battle of Jericho (USA) (v5.0) (Unl)</name>
     <cheat>
       <description>Exit always open</description>
       <code>075F:05+003F:FF</code>
@@ -23108,7 +23108,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="a00c77c3130316625403aeea9a0dbb02acf4a176740dac7b9e9a42452e574d4f">
-    <name>Metal Mech - Man \&amp; Machine (USA)</name>
+    <name>Metal Mech - Man &amp; Machine (USA)</name>
     <cheat>
       <description>Invincibility</description>
       <code>SZUAXYAX</code>
@@ -28736,7 +28736,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="501e921616931e4796c44b1e80c7112c881eb1e9a3190d0e6a3b4b199ee368e3">
-    <name>Ren \&amp; Stimpy Show, The - Buckeroo$! (USA)</name>
+    <name>Ren &amp; Stimpy Show, The - Buckeroo$! (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>NYOYXLYE</code>
@@ -30099,7 +30099,7 @@
       <code>AOUGPATE+AOUGZATE</code>
     </cheat>
     <cheat>
-      <description>Infinite Attack \&amp; Assail</description>
+      <description>Infinite Attack &amp; Assail</description>
       <code>00CD:FF</code>
     </cheat>
     <cheat>
@@ -30182,7 +30182,7 @@
       <code>AOUGPATE+AOUGZATE</code>
     </cheat>
     <cheat>
-      <description>Infinite Attack \&amp; Assail</description>
+      <description>Infinite Attack &amp; Assail</description>
       <code>00CD:FF</code>
     </cheat>
     <cheat>
@@ -31132,7 +31132,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="06fddd300a6d1cbe1be92e851e3d5d2defcc7e682903b569bc9fe71a26addd74">
-    <name>Skull \&amp; Crossbones (USA) (Unl)</name>
+    <name>Skull &amp; Crossbones (USA) (Unl)</name>
     <cheat>
       <description>Infinite continues</description>
       <code>SZNOTNVK</code>
@@ -35221,7 +35221,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="f3955370fe7ecc99afc27cdccf3482f75f06e0f431e42823c95982bb553ad6b9">
-    <name>Town \&amp; Country Surf Designs - Wood \&amp; Water Rage (USA)</name>
+    <name>Town &amp; Country Surf Designs - Wood &amp; Water Rage (USA)</name>
     <cheat>
       <description>Infinite lives for skating</description>
       <code>GXUZZZVG</code>
@@ -35256,7 +35256,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="cfa1cc0f40cf139b1ba61794838d52c029b40ea12194b4248178d8ae59c69b7a">
-    <name>Town \&amp; Country Surf Designs - Thrilla's Surfari (USA)</name>
+    <name>Town &amp; Country Surf Designs - Thrilla's Surfari (USA)</name>
     <cheat>
       <description>Infinite lives</description>
       <code>OZSIZYVK</code>
@@ -36442,7 +36442,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="e3be0290f198fceed633b037d9201aa4b95460617551b3a9fb5bb212b153a2d4">
-    <name>Thunder \&amp; Lightning (USA)</name>
+    <name>Thunder &amp; Lightning (USA)</name>
     <cheat>
       <description>Infinite lives - P1</description>
       <code>SINPPLVI</code>
@@ -37011,7 +37011,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="b49e3b3c2a307e9c24715ea5863d6c80b805f9566eb1f468a4c701cf54605a5a">
-    <name>Tom \&amp; Jerry - The Ultimate Game of Cat and Mouse! (USA)</name>
+    <name>Tom &amp; Jerry - The Ultimate Game of Cat and Mouse! (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>AEXYPAPA</code>
@@ -37434,7 +37434,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="a2812d80b3057aac9753f48247a7a46b29bea0b9aec04ca4c327180085c25b58">
-    <name>Track \&amp; Field (USA)</name>
+    <name>Track &amp; Field (USA)</name>
     <cheat>
       <description>Almost always qualify in Skeet Shooting and Archery</description>
       <code>NTXKTNKT</code>
@@ -39230,7 +39230,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="d30e480e7a99b5c3d8fe8faecf0bc0a14a9b163025eca9bf787f600fa927bb89">
-    <name>Wizards \&amp; Warriors (USA) (Rev A)</name>
+    <name>Wizards &amp; Warriors (USA) (Rev A)</name>
     <cheat>
       <description>Invincibility</description>
       <code>EINVTIEY</code>
@@ -39301,7 +39301,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="3ba4f6fd63a74338e438df43ddd1195f8913d69c11f6668d3bbf23a2a3cea459">
-    <name>Wizards \&amp; Warriors (USA)</name>
+    <name>Wizards &amp; Warriors (USA)</name>
     <cheat>
       <description>Invincibility</description>
       <code>EINVTIEY</code>
@@ -39372,7 +39372,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="2fa3ee5f9ef17dcd63f2f3936dc79b95a71f9e58521080250d4b4e7efbd471d2">
-    <name>Wizards \&amp; Warriors III - Kuros...Visions of Power (USA)</name>
+    <name>Wizards &amp; Warriors III - Kuros...Visions of Power (USA)</name>
     <cheat>
       <description>Infinite keys</description>
       <code>SXXNITVG</code>
@@ -42689,7 +42689,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="0a8cd5101f849ccd4e40d55fdc4edce914b2825b69eb76ec31cf53b59719e79e">
-    <name>Advanced Dungeons \&amp; Dragons - Eye of the Beholder (USA)</name>
+    <name>Advanced Dungeons &amp; Dragons - Eye of the Beholder (USA)</name>
     <cheat>
       <description>Infinite HP</description>
       <code>8285-6D2C+82DE-049B</code>
@@ -42716,7 +42716,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="8083307f3f4b7df9e5bf53d5f25877c2e548f0f677540d4ee62d60ccca3098f8">
-    <name>Adventures of Batman \&amp; Robin, The (USA)</name>
+    <name>Adventures of Batman &amp; Robin, The (USA)</name>
     <cheat>
       <description>Invincibility (except after being grabbed)</description>
       <code>2DC7-1DAD</code>
@@ -44500,7 +44500,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="d9127808fb02c47dd74fd22f39582c69f19936a794a8efc153cc0e51a0d4d782">
-    <name>Asterix \&amp; Obelix (Europe) (En,Fr,De,Es)</name>
+    <name>Asterix &amp; Obelix (Europe) (En,Fr,De,Es)</name>
     <cheat>
       <description>Infinite health</description>
       <code>7E008C:28</code>
@@ -52883,41 +52883,41 @@
     </cheat>
   </cartridge>
   <cartridge sha256="b698dd6e1db1a3fb2026dbc78c2cfbfd834f7c64fccb76139d5075c8b5233f28">
-    <name>Dragon Quest I \&amp; II (Japan)</name>
+    <name>Dragon Quest I &amp; II (Japan)</name>
     <cheat>
-      <description>DQ I \&amp; II - Infinite MP in battle</description>
+      <description>DQ I &amp; II - Infinite MP in battle</description>
       <code>82C0-6F43</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - Infinite MP ouside battle</description>
+      <description>DQ I &amp; II - Infinite MP ouside battle</description>
       <code>8BA6-DDD7</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - Keep gold after deposit in the vault</description>
+      <description>DQ I &amp; II - Keep gold after deposit in the vault</description>
       <code>44E0-DFDD</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - Take no damage from poison swamps</description>
+      <description>DQ I &amp; II - Take no damage from poison swamps</description>
       <code>3C67-0913</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - Take no damage from barriers</description>
+      <description>DQ I &amp; II - Take no damage from barriers</description>
       <code>8265-01C3</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - Take no damage from monster hits or magic</description>
+      <description>DQ I &amp; II - Take no damage from monster hits or magic</description>
       <code>1D6A-AD4E</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - Take no damage from monster fire</description>
+      <description>DQ I &amp; II - Take no damage from monster fire</description>
       <code>6DB6-DD43+DCB6-DD13</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - Inns don't take your money</description>
+      <description>DQ I &amp; II - Inns don't take your money</description>
       <code>C2E3-DF6F</code>
     </cheat>
     <cheat>
-      <description>DQ I \&amp; II - All equipment in shops is free</description>
+      <description>DQ I &amp; II - All equipment in shops is free</description>
       <code>6DA6-A7AF</code>
     </cheat>
     <cheat>
@@ -59145,7 +59145,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="b5492aea296ee4bfcd2c677fbec5153fd4c4db758c835b372ef750cf2399649b">
-    <name>Great Circus Mystery Starring Mickey \&amp; Minnie, The (USA)</name>
+    <name>Great Circus Mystery Starring Mickey &amp; Minnie, The (USA)</name>
     <cheat>
       <description>Invincibility against enemies</description>
       <code>6D94-E764</code>
@@ -60941,7 +60941,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="39bfe828571cdb23e7c85c23cf5b175979dcc2042c5841add58f5ae6492168a9">
-    <name>Itchy \&amp; Scratchy Game, The (USA)</name>
+    <name>Itchy &amp; Scratchy Game, The (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>C2E1-402E</code>
@@ -61466,7 +61466,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="3b2b8b813b58049a4a86ce1c42d2a651f19fd9bbab2407a494e20cf343d3c1a4">
-    <name>Joe \&amp; Mac (USA)</name>
+    <name>Joe &amp; Mac (USA)</name>
     <cheat>
       <description>Invincibility after one hit</description>
       <code>892C-64D4</code>
@@ -61569,7 +61569,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="38451dcbbcd7069ba232e704dcb747a1438bab0a9508218611a027a7f8dfd547">
-    <name>Joe \&amp; Mac 2 - Lost in the Tropics (USA) (Beta)</name>
+    <name>Joe &amp; Mac 2 - Lost in the Tropics (USA) (Beta)</name>
     <cheat>
       <description>Infinite health</description>
       <code>B982-176D</code>
@@ -61584,7 +61584,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="c9889799a9ae8558f26d66ae546db930c99acb78d921b4395afbbc38da6272aa">
-    <name>Joe \&amp; Mac 2 - Lost in the Tropics (USA)</name>
+    <name>Joe &amp; Mac 2 - Lost in the Tropics (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>B987-CD6D</code>
@@ -63564,7 +63564,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="1b58d0aed4510811c73d267244a7e915aa0b334c86e68f3fa5883f5cb534e4d7">
-    <name>King Arthur \&amp; The Knights of Justice (USA)</name>
+    <name>King Arthur &amp; The Knights of Justice (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>8B6B-14F4</code>
@@ -66538,7 +66538,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="73731a5a7932965de02a9e98055dcf88b4d17b8f710a6ecfde3e36a1f248773b">
-    <name>Lufia \&amp; The Fortress of Doom (USA)</name>
+    <name>Lufia &amp; The Fortress of Doom (USA)</name>
     <cheat>
       <description>Move around caves and world map quicker (except when leaving a vehicle)</description>
       <code>4DB4-D401</code>
@@ -72360,7 +72360,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="8715a641f2e4dd8b6066be7f2683d9129fff3fcccaf0a09cc8bdd2aa56460764">
-    <name>Mohawk \&amp; Headphone Jack (USA)</name>
+    <name>Mohawk &amp; Headphone Jack (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>7E0308:03</code>
@@ -75719,7 +75719,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="190742792a950a112f893cba0e083eb787cf24293f698967defff929635ba0e7">
-    <name>Operation Logic Bomb - The Ultimate Search \&amp; Destroy (USA)</name>
+    <name>Operation Logic Bomb - The Ultimate Search &amp; Destroy (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>C2B5-4DD0</code>
@@ -77200,7 +77200,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="72b2b3bead3fcd27a1610ad5d4d8be3235efeaff96df2e7858911992a5892d21">
-    <name>Pocky \&amp; Rocky (USA)</name>
+    <name>Pocky &amp; Rocky (USA)</name>
     <cheat>
       <description>Infinite health - Pocky</description>
       <code>C933-A794</code>
@@ -77303,7 +77303,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="cc33ae02114ea18a86592de327b2b4bcc80728b11a5e4c61666dca71480d4169">
-    <name>Pocky \&amp; Rocky 2 (USA)</name>
+    <name>Pocky &amp; Rocky 2 (USA)</name>
     <cheat>
       <description>Invincibility</description>
       <code>039731:60+069739:60</code>
@@ -79153,7 +79153,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="71e7083cfcf32b738f60f5eeffd4f9d1fd9250afbde0c56e22a4b97abac377a1">
-    <name>Ren \&amp; Stimpy Show, The - Fire Dogs (USA)</name>
+    <name>Ren &amp; Stimpy Show, The - Fire Dogs (USA)</name>
     <cheat>
       <description>Invincibility</description>
       <code>7E257E:05</code>
@@ -79224,7 +79224,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="ad7dd4efb8836d4009f6c76bd21865d8f5dcf9c3cbd8fa7bb32d686488847120">
-    <name>Ren \&amp; Stimpy Show, The - Time Warp (USA)</name>
+    <name>Ren &amp; Stimpy Show, The - Time Warp (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>82ED-4DD6</code>
@@ -79271,7 +79271,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="ba54d715abf100b94fee801351986fa818e4309730cefbacf9b4fad36e284c1c">
-    <name>Ren \&amp; Stimpy Show, The - Veediots! (USA)</name>
+    <name>Ren &amp; Stimpy Show, The - Veediots! (USA)</name>
     <cheat>
       <description>Infinite health</description>
       <code>C2CD-0FA0</code>
@@ -80209,7 +80209,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="4fc2832e7aa01d105ca67977b38840ec1188869b5e74d20e58613c1cd127d78f">
-    <name>Rockman \&amp; Forte (Japan)</name>
+    <name>Rockman &amp; Forte (Japan)</name>
     <cheat>
       <description>Invincibility against enemies</description>
       <code>1808-5FA2</code>
@@ -86678,7 +86678,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="48afb82875ed4309f871f6b14021aa82c026fb14dc8acdbcf35f71ee605771b5">
-    <name>Super Donkey Kong 2 - Dixie \&amp; Diddy (Japan)</name>
+    <name>Super Donkey Kong 2 - Dixie &amp; Diddy (Japan)</name>
     <cheat>
       <description>Invincibility</description>
       <code>4022-431D</code>
@@ -92482,7 +92482,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="3cdebbd8adc4bb6773a7995f542fdac49adefca71cba583255a1c1bf37ac3946">
-    <name>Tetris \&amp; Dr. Mario (USA)</name>
+    <name>Tetris &amp; Dr. Mario (USA)</name>
     <cheat>
       <description>Tetris - Level never increases</description>
       <code>6DB4-1F65</code>
@@ -92869,7 +92869,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="271a67b32b3bb00ceb0f4e7d81494888d0d821635f0f936d481dfbe671567c08">
-    <name>Timon \&amp; Pumbaa's Jungle Games (USA)</name>
+    <name>Timon &amp; Pumbaa's Jungle Games (USA)</name>
     <cheat>
       <description>Infinite ammo/balls</description>
       <code>7E00DC:09</code>
@@ -100764,7 +100764,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="bbc006dcf175f1fec822c533bed6abc136a98bcb3b6f8d726cc87c8e17c62e1f">
-    <name>Joe \&amp; Mac (USA)</name>
+    <name>Joe &amp; Mac (USA)</name>
     <cheat>
       <description>Infinite lives</description>
       <code>002-37D-E6E</code>
@@ -102758,7 +102758,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="46cfbba977f7d4cb8df51d5cb51f00dc0a4d9c129868a1ed88f2b0fa97454905">
-    <name>Ren \&amp; Stimpy Show, The - Space Cadet Adventures (USA)</name>
+    <name>Ren &amp; Stimpy Show, The - Space Cadet Adventures (USA)</name>
     <cheat>
       <description>Infinite lives</description>
       <code>F07-54E-6E9</code>
@@ -103181,7 +103181,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="c8979ad731912452dabedff2c9fb23b19aa68cfdedbf5e99fec902547ce1bb76">
-    <name>Simpsons, The - Bart \&amp; the Beanstalk (USA, Europe)</name>
+    <name>Simpsons, The - Bart &amp; the Beanstalk (USA, Europe)</name>
     <cheat>
       <description>Invincibility</description>
       <code>C97-2CC-E69</code>
@@ -103246,15 +103246,15 @@
       <code>033-5B9-F76</code>
     </cheat>
     <cheat>
-      <description>Capt. Lance Murdock's Skateboard Bash \&amp; Crash - Infinite lives</description>
+      <description>Capt. Lance Murdock's Skateboard Bash &amp; Crash - Infinite lives</description>
       <code>FAF-829-4C1</code>
     </cheat>
     <cheat>
-      <description>Capt. Lance Murdock's Skateboard Bash \&amp; Crash - Start with 1 life</description>
+      <description>Capt. Lance Murdock's Skateboard Bash &amp; Crash - Start with 1 life</description>
       <code>01E-A89-F76</code>
     </cheat>
     <cheat>
-      <description>Capt. Lance Murdock's Skateboard Bash \&amp; Crash - Start with 2 lives</description>
+      <description>Capt. Lance Murdock's Skateboard Bash &amp; Crash - Start with 2 lives</description>
       <code>02E-A89-F76</code>
     </cheat>
     <cheat>
@@ -103287,7 +103287,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="534478ebd2558ab6a871540062fadbb0ea27808d7f6860942b2e6805fd15e87b">
-    <name>Simpsons Itchy \&amp; Scratchy, The - Miniature Golf Madness (USA, Europe)</name>
+    <name>Simpsons Itchy &amp; Scratchy, The - Miniature Golf Madness (USA, Europe)</name>
     <cheat>
       <description>Invincibility</description>
       <code>00A-07A-C49</code>
@@ -105113,7 +105113,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="597f70c8d600427fee6f3a3714115bad30b24402dd830c36dc010a7b3a92a7a3">
-    <name>Tom \&amp; Jerry (USA, Europe)</name>
+    <name>Tom &amp; Jerry (USA, Europe)</name>
     <cheat>
       <description>Infinite lives</description>
       <code>008-54D-B3D</code>
@@ -105191,7 +105191,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="bb2f56c5035b47183c55b197bc380ea02df00dd733ce732d062f7c7695bd330f">
-    <name>Top Gun - Guts \&amp; Glory (USA, Europe)</name>
+    <name>Top Gun - Guts &amp; Glory (USA, Europe)</name>
     <cheat>
       <description>Infinite missiles</description>
       <code>FA4-249-4C1</code>
@@ -105265,7 +105265,7 @@
     </cheat>
   </cartridge>
   <cartridge sha256="eae3b192006eff607dffdae3d7720af579f85335be81e6cacb55276bfc32424c">
-    <name>Track \&amp; Field (USA, Europe)</name>
+    <name>Track &amp; Field (USA, Europe)</name>
     <cheat>
       <description>Always have 100% power</description>
       <code>3E7-7FD-4CA+007-80D-E6E</code>
