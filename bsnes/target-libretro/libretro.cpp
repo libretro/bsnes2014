@@ -79,6 +79,7 @@ struct Callbacks : Emulator::Interface::Bind {
        default:
        case RETRO_DEVICE_NONE:                 return SuperFamicom::Input::Device::None;
        case RETRO_DEVICE_JOYPAD:               return SuperFamicom::Input::Device::Joypad;
+       case RETRO_DEVICE_ANALOG:               return SuperFamicom::Input::Device::Joypad;
        case RETRO_DEVICE_JOYPAD_MULTITAP:      return SuperFamicom::Input::Device::Multitap;
        case RETRO_DEVICE_MOUSE:                return SuperFamicom::Input::Device::Mouse;
        case RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE: return SuperFamicom::Input::Device::SuperScope;
