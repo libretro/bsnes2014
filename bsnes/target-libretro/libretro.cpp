@@ -394,9 +394,9 @@ bool retro_load_game(const struct retro_game_info *info) {
        dot = strrchr(core_bind.basename(), '\\');
 
     if (dot)
-       dot[1] = '\0';
+      dot[1] = '\0';
     else
-       core_bind.basename = ".";
+      core_bind.basename = "";
   }
 
   core_interface.mode = SuperFamicomCartridge::ModeNormal;
@@ -409,9 +409,14 @@ bool retro_load_game_special(unsigned game_type,
   retro_cheat_reset();
   if (info[0].path) {
     core_bind.basename = info[0].path;
-    char *dot = strrchr(core_bind.basename(), '.');
+    char *dot = strrchr(core_bind.basename(), '/');
+    if (!dot)
+       dot = strrchr(core_bind.basename(), '\\');
+
     if (dot)
-       *dot = '\0';
+      dot[1] = '\0';
+    else
+      core_bind.basename = "";
   }
 
   switch (game_type) {
