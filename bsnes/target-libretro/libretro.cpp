@@ -395,6 +395,8 @@ bool retro_load_game(const struct retro_game_info *info) {
 
     if (dot)
        dot[1] = '\0';
+    else
+       core_bind.basename = ".";
   }
 
   core_interface.mode = SuperFamicomCartridge::ModeNormal;
