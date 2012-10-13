@@ -123,13 +123,20 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   void loadRequest(unsigned id, const string &p) {
+    // Look for BIOS in system directory as well.
+    const char *dir = 0;
+    penviron(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir);
+
     string load_path = {path(0), p};
-    fprintf(stderr, "bsnes: Load_path: %s\n", (const char*)load_path);
     if(file::exists(load_path)) {
       mmapstream stream(load_path);
       iface->load(id, stream);
+    } else if(dir) {
+      load_path = {dir, "/", p};
+      mmapstream stream(load_path);
+      iface->load(id, stream);
     } else {
-      fprintf(stderr, "bsnes: Cannot find path: \"%s\".\n", (const char*)load_path);
+      fprintf(stderr, "bsnes: Cannot find requested file: \"%s\".\n", (const char*)p);
     }
   }
 
@@ -305,7 +312,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
 
   unsigned base_width = 256;
   unsigned base_height = core_bind.overscan ? 240 : 224;
-  struct retro_game_geometry geom = { base_width, base_height, base_width << 1, base_height << 1 };
+  struct retro_game_geometry geom = { base_width, base_height, base_width << 1, base_height << 1, 4.0 / 3.0 };
 
   info->timing   = timing;
   info->geometry = geom;
