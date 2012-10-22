@@ -51,10 +51,7 @@ struct Callbacks : Emulator::Interface::Bind {
   bool overscan;
 
   Emulator::Interface *iface;
-
   string basename;
-  uint16_t buffer[512 * 448];
-  SuperFamicom::Video video;
 
   static unsigned snes_to_retro(unsigned device) {
     switch ((SuperFamicom::Input::Device)device) {
@@ -89,9 +86,6 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   void videoRefresh(const uint32_t *data, unsigned pitch, unsigned width, unsigned height) {
-
-    pitch >>= 2;
-
     if (!overscan) {
       data += 8 * 1024;
 
@@ -101,15 +95,7 @@ struct Callbacks : Emulator::Interface::Bind {
         height = 448;
     }
 
-    uint16_t *dp = buffer;
-    const uint32_t *sp = data;
-    for(unsigned y = 0; y < height; y++, sp += pitch) {
-      for(unsigned x = 0; x < width; x++) {
-        *dp++ = sp[x];
-      }
-    }
-
-    pvideo_refresh(buffer, width, height, width << 1);
+    pvideo_refresh(data, width, height, pitch);
     pinput_poll();
   }
 
@@ -145,10 +131,10 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   uint32_t videoColor(unsigned, uint16_t r, uint16_t g, uint16_t b) {
-    r >>= 11;
-    g >>= 11;
-    b >>= 11;
-    return (r << 10) | (g << 5) | (b << 0);
+    r >>= 8;
+    g >>= 8;
+    b >>= 8;
+    return (r << 16) | (g << 8) | (b << 0);
   }
 };
 
@@ -316,6 +302,9 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
 
   info->timing   = timing;
   info->geometry = geom;
+
+  enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+  core_bind.penviron(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt);
 }
 
 static bool snes_load_cartridge_normal(
