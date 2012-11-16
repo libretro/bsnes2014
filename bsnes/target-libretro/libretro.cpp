@@ -382,6 +382,12 @@ static bool snes_load_cartridge_super_game_boy(
 }
 
 bool retro_load_game(const struct retro_game_info *info) {
+  const uint8_t *data = (const uint8_t*)info->data;
+  size_t size = info->size;
+  if ((size & 0x7ffff) == 512) {
+    size -= 512;
+    data += 512;
+  }
   retro_cheat_reset();
   if (info->path) {
     core_bind.basename = info->path;
@@ -396,11 +402,18 @@ bool retro_load_game(const struct retro_game_info *info) {
   }
 
   core_interface.mode = SuperFamicomCartridge::ModeNormal;
-  return snes_load_cartridge_normal(info->meta, (const uint8_t*)info->data, info->size);
+  return snes_load_cartridge_normal(info->meta, data, size);
 }
 
 bool retro_load_game_special(unsigned game_type,
       const struct retro_game_info *info, size_t num_info) {
+
+  const uint8_t *data = (const uint8_t*)info[0].data;
+  size_t size = info[0].size;
+  if ((size & 0x7ffff) == 512) {
+    size -= 512;
+    data += 512;
+  }
 
   retro_cheat_reset();
   if (info[0].path) {
@@ -418,22 +431,22 @@ bool retro_load_game_special(unsigned game_type,
   switch (game_type) {
      case RETRO_GAME_TYPE_BSX:
        core_interface.mode = SuperFamicomCartridge::ModeBsx;
-       return num_info == 2 && snes_load_cartridge_bsx(info[0].meta, (const uint8_t*)info[0].data, info[0].size,
+       return num_info == 2 && snes_load_cartridge_bsx(info[0].meta, data, size,
              info[1].meta, (const uint8_t*)info[1].data, info[1].size);
        
      case RETRO_GAME_TYPE_BSX_SLOTTED:
        core_interface.mode = SuperFamicomCartridge::ModeBsxSlotted;
-       return num_info == 2 && snes_load_cartridge_bsx_slotted(info[0].meta, (const uint8_t*)info[0].data, info[0].size,
+       return num_info == 2 && snes_load_cartridge_bsx_slotted(info[0].meta, data, size,
              info[1].meta, (const uint8_t*)info[1].data, info[1].size);
 
      case RETRO_GAME_TYPE_SUPER_GAME_BOY:
        core_interface.mode = SuperFamicomCartridge::ModeSuperGameBoy;
-       return num_info == 2 && snes_load_cartridge_super_game_boy(info[0].meta, (const uint8_t*)info[0].data, info[0].size,
+       return num_info == 2 && snes_load_cartridge_super_game_boy(info[0].meta, data, size,
              info[1].meta, (const uint8_t*)info[1].data, info[1].size);
 
      case RETRO_GAME_TYPE_SUFAMI_TURBO:
        core_interface.mode = SuperFamicomCartridge::ModeSufamiTurbo;
-       return num_info == 3 && snes_load_cartridge_sufami_turbo(info[0].meta, (const uint8_t*)info[0].data, info[0].size,
+       return num_info == 3 && snes_load_cartridge_sufami_turbo(info[0].meta, data, size,
              info[1].meta, (const uint8_t*)info[1].data, info[1].size,
              info[2].meta, (const uint8_t*)info[2].data, info[2].size);
 
