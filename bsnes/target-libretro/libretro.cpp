@@ -50,6 +50,8 @@ struct Callbacks : Emulator::Interface::Bind {
   retro_environment_t penviron;
   bool overscan;
 
+  bool load_request_error;
+
   Emulator::Interface *iface;
   string basename;
 
@@ -119,10 +121,16 @@ struct Callbacks : Emulator::Interface::Bind {
       iface->load(id, stream);
     } else if(dir) {
       load_path = {dir, "/", p};
-      mmapstream stream(load_path);
-      iface->load(id, stream);
+      if(file::exists(load_path)) {
+        mmapstream stream(load_path);
+        iface->load(id, stream);
+      } else {
+        fprintf(stderr, "[bSNES]: Cannot find requested file in system directory: \"%s\".\n", (const char*)load_path);
+        load_request_error = true;
+      }
     } else {
-      fprintf(stderr, "bsnes: Cannot find requested file: \"%s\".\n", (const char*)p);
+      fprintf(stderr, "[bSNES]: Cannot find requested file: \"%s\" in ROM directory nor system directory.\n", (const char*)p);
+      load_request_error = true;
     }
   }
 
@@ -313,7 +321,7 @@ static bool snes_load_cartridge_normal(
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
   SuperFamicom::system.power();
-  return true;
+  return !core_bind.load_request_error;
 }
 
 static bool snes_load_cartridge_bsx_slotted(
@@ -327,7 +335,7 @@ static bool snes_load_cartridge_bsx_slotted(
   SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
 
   SuperFamicom::system.power();
-  return true;
+  return !core_bind.load_request_error;
 }
 
 static bool snes_load_cartridge_bsx(
@@ -341,7 +349,7 @@ static bool snes_load_cartridge_bsx(
   SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
 
   SuperFamicom::system.power();
-  return true;
+  return !core_bind.load_request_error;
 }
 
 static bool snes_load_cartridge_sufami_turbo(
@@ -358,7 +366,7 @@ static bool snes_load_cartridge_sufami_turbo(
   SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
 
   SuperFamicom::system.power();
-  return true;
+  return !core_bind.load_request_error;
 }
 
 static bool snes_load_cartridge_super_game_boy(
@@ -378,7 +386,7 @@ static bool snes_load_cartridge_super_game_boy(
 
   SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
   SuperFamicom::system.power();
-  return true;
+  return !core_bind.load_request_error;
 }
 
 bool retro_load_game(const struct retro_game_info *info) {
@@ -390,6 +398,7 @@ bool retro_load_game(const struct retro_game_info *info) {
   }
   retro_cheat_reset();
   if (info->path) {
+    core_bind.load_request_error = false;
     core_bind.basename = info->path;
     char *dot = strrchr(core_bind.basename(), '/');
     if (!dot)
@@ -417,6 +426,7 @@ bool retro_load_game_special(unsigned game_type,
 
   retro_cheat_reset();
   if (info[0].path) {
+    core_bind.load_request_error = false;
     core_bind.basename = info[0].path;
     char *dot = strrchr(core_bind.basename(), '/');
     if (!dot)
