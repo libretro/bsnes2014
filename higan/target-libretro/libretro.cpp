@@ -49,6 +49,8 @@ struct Callbacks : Emulator::Interface::Bind {
   bool overscan;
 
   bool load_request_error;
+  const uint8_t *rom_data;
+  unsigned rom_size;
 
   Emulator::Interface *iface;
   string basename;
@@ -108,7 +110,7 @@ struct Callbacks : Emulator::Interface::Bind {
     return pinput_state(port, snes_to_retro(device), 0, snes_to_retro(device, id));
   }
 
-  void loadRequest(unsigned id, const string &p) {
+  void loadBIOS(unsigned id, const string &p) {
     // Look for BIOS in system directory as well.
     const char *dir = 0;
     penviron(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir);
@@ -129,6 +131,36 @@ struct Callbacks : Emulator::Interface::Bind {
     } else {
       fprintf(stderr, "[bSNES]: Cannot find requested file: \"%s\" in ROM directory nor system directory.\n", (const char*)p);
       load_request_error = true;
+    }
+  }
+
+  void loadROM(unsigned id, const string &) {
+    memorystream stream(rom_data, rom_size);
+    iface->load(id, stream);
+  }
+
+  void loadIPLROM(unsigned id, const string &) {
+    memorystream stream(iplrom, sizeof(iplrom));
+    iface->load(id, stream);
+  }
+
+  void loadRequest(unsigned id, const string &p) {
+    switch(id) {
+      case SuperFamicom::ID::ROM:
+        loadROM(id, p);
+        break;
+
+      case SuperFamicom::ID::RAM:
+        // Don't load here.
+        break;
+
+      case SuperFamicom::ID::IPLROM:
+        loadIPLROM(id, p);
+        break;
+
+      default:
+        loadBIOS(id, p);
+        break;
     }
   }
 
@@ -227,7 +259,6 @@ void retro_init(void) {
 
   core_interface.init();
 
-  memcpy(SuperFamicom::smp.iplrom, iplrom, 64);
   SuperFamicom::system.init();
   SuperFamicom::input.connect(SuperFamicom::Controller::Port1, SuperFamicom::Input::Device::Joypad);
   SuperFamicom::input.connect(SuperFamicom::Controller::Port2, SuperFamicom::Input::Device::Joypad);
@@ -317,6 +348,9 @@ static bool snes_load_cartridge_normal(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size
 ) {
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
+
+  core_bind.rom_data = rom_data;
+  core_bind.rom_size = rom_size;
   SuperFamicom::cartridge.load(xmlrom);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
