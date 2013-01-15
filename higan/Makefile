@@ -38,23 +38,25 @@ else ifeq ($(pgo),optimize)
 endif
 
 # platform
-ifeq ($(platform),x)
-  flags += -march=native
-  link += -Wl,-export-dynamic -ldl -lX11 -lXext
-else ifeq ($(platform),win)
-  ifeq ($(arch),win32)
-    flags += -m32
-    link += -m32
-  endif
-  ifeq ($(console),true)
-    link += -mconsole
+ifeq ($(findstring libretro,$(ui)),)
+  ifeq ($(platform),x)
+    flags += -march=native
+    link += -Wl,-export-dynamic -ldl -lX11 -lXext
+  else ifeq ($(platform),win)
+    ifeq ($(arch),win32)
+      flags += -m32
+      link += -m32
+    endif
+    ifeq ($(console),true)
+      link += -mconsole
+    else
+      link += -mwindows
+    endif
+    link += -mthreads -luuid -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -lshell32 -lole32 -lws2_32
+    link += -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
   else
-    link += -mwindows
+    unknown_platform: help;
   endif
-  link += -mthreads -luuid -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -lshell32 -lole32 -lws2_32
-  link += -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
-else
-  unknown_platform: help;
 endif
 
 ui := target-$(target)
