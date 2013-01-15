@@ -1,9 +1,7 @@
 #include "libretro.h"
 #include <sfc/sfc.hpp>
-
-#include <nall/snes/cartridge.hpp>
-#include <nall/gb/cartridge.hpp>
 #include <nall/stream/mmap.hpp>
+#include "../../ananke/heuristics/super-famicom.hpp"
 using namespace nall;
 
 const uint8 iplrom[64] = {
@@ -156,14 +154,14 @@ struct Interface : public SuperFamicom::Interface {
   Interface(); 
 
   void init() {
-    updatePalette();
+     SuperFamicom::video.generate_palette();
   }
 };
 
 struct GBInterface : public GameBoy::Interface {
   GBInterface() { bind = &core_bind; }
   void init() {
-    updatePalette();
+     SuperFamicom::video.generate_palette();
   }
 };
 
@@ -270,7 +268,7 @@ struct CheatList {
   CheatList() : enable(false) {}
 };
 
-static linear_vector<CheatList> cheatList;
+static vector<CheatList> cheatList;
 
 void retro_cheat_reset(void) {
   cheatList.reset();
@@ -319,7 +317,7 @@ static bool snes_load_cartridge_normal(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size
 ) {
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
-  SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
+  SuperFamicom::cartridge.load(xmlrom);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
 }
@@ -328,6 +326,7 @@ static bool snes_load_cartridge_bsx_slotted(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size,
   const char *bsx_xml, const uint8_t *bsx_data, unsigned bsx_size
 ) {
+#if 0
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SuperFamicomCartridge(bsx_data, bsx_size).markup;
 
@@ -336,12 +335,15 @@ static bool snes_load_cartridge_bsx_slotted(
 
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
+#endif
+  return false;
 }
 
 static bool snes_load_cartridge_bsx(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size,
   const char *bsx_xml, const uint8_t *bsx_data, unsigned bsx_size
 ) {
+#if 0
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SuperFamicomCartridge(bsx_data, bsx_size).markup;
 
@@ -350,6 +352,8 @@ static bool snes_load_cartridge_bsx(
 
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
+#endif
+  return false;
 }
 
 static bool snes_load_cartridge_sufami_turbo(
@@ -357,6 +361,7 @@ static bool snes_load_cartridge_sufami_turbo(
   const char *sta_xml, const uint8_t *sta_data, unsigned sta_size,
   const char *stb_xml, const uint8_t *stb_data, unsigned stb_size
 ) {
+#if 0
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   string xmlsta = (sta_xml && *sta_xml) ? string(sta_xml) : SuperFamicomCartridge(sta_data, sta_size).markup;
   string xmlstb = (stb_xml && *stb_xml) ? string(stb_xml) : SuperFamicomCartridge(stb_data, stb_size).markup;
@@ -367,12 +372,15 @@ static bool snes_load_cartridge_sufami_turbo(
 
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
+#endif
+  return false;
 }
 
 static bool snes_load_cartridge_super_game_boy(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size,
   const char *dmg_xml, const uint8_t *dmg_data, unsigned dmg_size
 ) {
+#if 0
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
 
   if(dmg_data) {
@@ -387,6 +395,8 @@ static bool snes_load_cartridge_super_game_boy(
   SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
+#endif
+  return false;
 }
 
 bool retro_load_game(const struct retro_game_info *info) {
@@ -400,6 +410,7 @@ bool retro_load_game(const struct retro_game_info *info) {
   if (info->path) {
     core_bind.load_request_error = false;
     core_bind.basename = info->path;
+
     char *dot = strrchr(core_bind.basename(), '/');
     if (!dot)
        dot = strrchr(core_bind.basename(), '\\');
@@ -407,7 +418,7 @@ bool retro_load_game(const struct retro_game_info *info) {
     if (dot)
       dot[1] = '\0';
     else
-      core_bind.basename = "";
+      core_bind.basename = "./";
   }
 
   core_interface.mode = SuperFamicomCartridge::ModeNormal;
@@ -480,12 +491,9 @@ void* retro_get_memory_data(unsigned id) {
     case RETRO_MEMORY_SAVE_RAM:
       return SuperFamicom::cartridge.ram.data();
     case RETRO_MEMORY_RTC:
-      if(SuperFamicom::cartridge.has_srtc()) return SuperFamicom::srtc.rtc;
-      if(SuperFamicom::cartridge.has_spc7110rtc()) return SuperFamicom::spc7110.rtc;
-      return 0;
+      return nullptr;
     case RETRO_MEMORY_SNES_BSX_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeBsx) break;
-      return SuperFamicom::bsxcartridge.sram.data();
+      return nullptr;
     case RETRO_MEMORY_SNES_BSX_PRAM:
       if(core_interface.mode != SuperFamicomCartridge::ModeBsx) break;
       return SuperFamicom::bsxcartridge.psram.data();
@@ -505,7 +513,7 @@ void* retro_get_memory_data(unsigned id) {
       return SuperFamicom::ppu.vram;
   }
 
-  return 0;
+  return nullptr;
 }
 
 size_t retro_get_memory_size(unsigned id) {
@@ -517,11 +525,10 @@ size_t retro_get_memory_size(unsigned id) {
       size = SuperFamicom::cartridge.ram.size();
       break;
     case RETRO_MEMORY_RTC:
-      if(SuperFamicom::cartridge.has_srtc() || SuperFamicom::cartridge.has_spc7110rtc()) size = 20;
+      size = 0;
       break;
     case RETRO_MEMORY_SNES_BSX_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeBsx) break;
-      size = SuperFamicom::bsxcartridge.sram.size();
+      size = 0;
       break;
     case RETRO_MEMORY_SNES_BSX_PRAM:
       if(core_interface.mode != SuperFamicomCartridge::ModeBsx) break;
