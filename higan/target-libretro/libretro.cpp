@@ -2,6 +2,7 @@
 #include <sfc/sfc.hpp>
 #include <nall/stream/mmap.hpp>
 #include "../../ananke/heuristics/super-famicom.hpp"
+#include "../../ananke/heuristics/game-boy.hpp"
 using namespace nall;
 
 const uint8 iplrom[64] = {
@@ -51,6 +52,8 @@ struct Callbacks : Emulator::Interface::Bind {
   bool load_request_error;
   const uint8_t *rom_data;
   unsigned rom_size;
+  const uint8_t *gb_rom_data;
+  unsigned gb_rom_size;
 
   Emulator::Interface *iface;
   string basename;
@@ -135,8 +138,13 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   void loadROM(unsigned id, const string &) {
-    memorystream stream(rom_data, rom_size);
-    iface->load(id, stream);
+    if(gb_rom_data) {
+      memorystream stream(gb_rom_data, gb_rom_size);
+      iface->load(id, stream);
+    } else {
+      memorystream stream(rom_data, rom_size);
+      iface->load(id, stream);
+    }
   }
 
   void loadIPLROM(unsigned id, const string &) {
@@ -147,11 +155,17 @@ struct Callbacks : Emulator::Interface::Bind {
   void loadRequest(unsigned id, const string &p) {
     switch(id) {
       case SuperFamicom::ID::ROM:
+      case SuperFamicom::ID::SuperGameBoyROM:
         loadROM(id, p);
         break;
 
       case SuperFamicom::ID::RAM:
+      case SuperFamicom::ID::SuperGameBoyRAM:
         // Don't load here.
+        break;
+
+      case SuperFamicom::ID::SuperGameBoyBootROM:
+        loadROM(id, p);
         break;
 
       case SuperFamicom::ID::IPLROM:
@@ -414,23 +428,17 @@ static bool snes_load_cartridge_super_game_boy(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size,
   const char *dmg_xml, const uint8_t *dmg_data, unsigned dmg_size
 ) {
-#if 0
-  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
+  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : GameBoyCartridge((uint8_t*)dmg_data, dmg_size).markup;
+  //fprintf(stderr, "[bSNES]: Markup: %s\n", (const char*)xmlrom);
 
-  if(dmg_data) {
-    //GameBoyCartridge needs to modify dmg_data (for MMM01 emulation); so copy data
-    uint8_t *data = new uint8_t[dmg_size];
-    memcpy(data, dmg_data, dmg_size);
-    string xmldmg = (dmg_xml && *dmg_xml) ? string(dmg_xml) : GameBoyCartridge(data, dmg_size).markup;
-    GameBoy::cartridge.load(GameBoy::System::Revision::SuperGameBoy, xmldmg, memorystream(data, dmg_size));
-    delete[] data;
-  }
+  core_bind.rom_data = rom_data;
+  core_bind.rom_size = rom_size;
+  core_bind.gb_rom_data = dmg_data;
+  core_bind.gb_rom_size = dmg_size;
 
-  SuperFamicom::cartridge.load(xmlrom, memorystream(rom_data, rom_size));
+  SuperFamicom::cartridge.load_super_game_boy(xmlrom);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
-#endif
-  return false;
 }
 
 bool retro_load_game(const struct retro_game_info *info) {
