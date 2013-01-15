@@ -3,4 +3,6 @@ purify/purify
 purify/analyze-gba
 ananke/ananke.o
 ananke/libananke.so
-higan/out
+higan/out/libretro.so
+higan/out/retro.dll
+higan/out/libretro.dylib
