@@ -52,8 +52,7 @@ struct Callbacks : Emulator::Interface::Bind {
   bool load_request_error;
   const uint8_t *rom_data;
   unsigned rom_size;
-  const uint8_t *gb_rom_data;
-  unsigned gb_rom_size;
+  SuperFamicom::MappedRAM *sram;
 
   Emulator::Interface *iface;
   string basename;
@@ -138,13 +137,8 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   void loadROM(unsigned id, const string &) {
-    if(gb_rom_data) {
-      memorystream stream(gb_rom_data, gb_rom_size);
-      iface->load(id, stream);
-    } else {
-      memorystream stream(rom_data, rom_size);
-      iface->load(id, stream);
-    }
+    memorystream stream(rom_data, rom_size);
+    iface->load(id, stream);
   }
 
   void loadIPLROM(unsigned id, const string &) {
@@ -158,21 +152,24 @@ struct Callbacks : Emulator::Interface::Bind {
       case SuperFamicom::ID::SuperFXROM:
       case SuperFamicom::ID::SA1ROM:
       case SuperFamicom::ID::SDD1ROM:
-      case SuperFamicom::ID::SuperGameBoyROM:
         loadROM(id, p);
         break;
 
+      // SRAM. Have to special case for all chips ...
       case SuperFamicom::ID::RAM:
-      case SuperFamicom::ID::SuperFXRAM:
-      case SuperFamicom::ID::SA1IRAM:
-      case SuperFamicom::ID::SA1BWRAM:
-      case SuperFamicom::ID::SDD1RAM:
-      case SuperFamicom::ID::SuperGameBoyRAM:
-        // Don't load here.
+        sram = &SuperFamicom::cartridge.ram;
         break;
-
-      case SuperFamicom::ID::SuperGameBoyBootROM:
-        loadROM(id, p);
+      case SuperFamicom::ID::SuperFXRAM:
+        sram = &SuperFamicom::superfx.ram;
+        break;
+      case SuperFamicom::ID::SA1BWRAM:
+        sram = &SuperFamicom::sa1.bwram;
+        break;
+      case SuperFamicom::ID::SDD1RAM:
+        sram = &SuperFamicom::sdd1.ram;
+        break;
+      case SuperFamicom::ID::OBC1RAM:
+        sram = &SuperFamicom::obc1.ram;
         break;
 
       case SuperFamicom::ID::IPLROM:
@@ -436,6 +433,7 @@ static bool snes_load_cartridge_super_game_boy(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size,
   const char *dmg_xml, const uint8_t *dmg_data, unsigned dmg_size
 ) {
+#if 0
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : GameBoyCartridge((uint8_t*)dmg_data, dmg_size).markup;
   //fprintf(stderr, "[bSNES]: Markup: %s\n", (const char*)xmlrom);
 
@@ -447,6 +445,8 @@ static bool snes_load_cartridge_super_game_boy(
   SuperFamicom::cartridge.load_super_game_boy(xmlrom);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
+#endif
+  return false;
 }
 
 bool retro_load_game(const struct retro_game_info *info) {
@@ -539,7 +539,7 @@ void* retro_get_memory_data(unsigned id) {
 
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
-      return SuperFamicom::cartridge.ram.data();
+      return core_bind.sram ? core_bind.sram->data() : nullptr;
     case RETRO_MEMORY_RTC:
       return nullptr;
     case RETRO_MEMORY_SNES_BSX_RAM:
@@ -572,7 +572,8 @@ size_t retro_get_memory_size(unsigned id) {
 
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
-      size = SuperFamicom::cartridge.ram.size();
+      if (core_bind.sram)
+         size = core_bind.sram->size();
       fprintf(stderr, "[bSNES]: SRAM memory size: %u.\n", (unsigned)size);
       break;
     case RETRO_MEMORY_RTC:
