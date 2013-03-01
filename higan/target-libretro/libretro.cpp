@@ -155,11 +155,16 @@ struct Callbacks : Emulator::Interface::Bind {
   void loadRequest(unsigned id, const string &p) {
     switch(id) {
       case SuperFamicom::ID::ROM:
+      case SuperFamicom::ID::SuperFXROM:
+      case SuperFamicom::ID::SA1ROM:
       case SuperFamicom::ID::SuperGameBoyROM:
         loadROM(id, p);
         break;
 
       case SuperFamicom::ID::RAM:
+      case SuperFamicom::ID::SuperFXRAM:
+      case SuperFamicom::ID::SA1IRAM:
+      case SuperFamicom::ID::SA1BWRAM:
       case SuperFamicom::ID::SuperGameBoyRAM:
         // Don't load here.
         break;
@@ -366,6 +371,7 @@ static bool snes_load_cartridge_normal(
   core_bind.rom_data = rom_data;
   core_bind.rom_size = rom_size;
   SuperFamicom::cartridge.load(xmlrom);
+  fprintf(stderr, "[bSNES]: XML map:\n%s\n", (const char*)xmlrom);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
 }
@@ -565,6 +571,7 @@ size_t retro_get_memory_size(unsigned id) {
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
       size = SuperFamicom::cartridge.ram.size();
+      fprintf(stderr, "[bSNES]: SRAM memory size: %u.\n", (unsigned)size);
       break;
     case RETRO_MEMORY_RTC:
       size = 0;
