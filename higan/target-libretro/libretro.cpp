@@ -157,6 +157,7 @@ struct Callbacks : Emulator::Interface::Bind {
       case SuperFamicom::ID::ROM:
       case SuperFamicom::ID::SuperFXROM:
       case SuperFamicom::ID::SA1ROM:
+      case SuperFamicom::ID::SDD1ROM:
       case SuperFamicom::ID::SuperGameBoyROM:
         loadROM(id, p);
         break;
@@ -165,6 +166,7 @@ struct Callbacks : Emulator::Interface::Bind {
       case SuperFamicom::ID::SuperFXRAM:
       case SuperFamicom::ID::SA1IRAM:
       case SuperFamicom::ID::SA1BWRAM:
+      case SuperFamicom::ID::SDD1RAM:
       case SuperFamicom::ID::SuperGameBoyRAM:
         // Don't load here.
         break;
