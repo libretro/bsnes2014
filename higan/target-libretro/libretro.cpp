@@ -52,6 +52,9 @@ struct Callbacks : Emulator::Interface::Bind {
   bool load_request_error;
   const uint8_t *rom_data;
   unsigned rom_size;
+  const uint8_t *gb_rom_data;
+  unsigned gb_rom_size;
+  string xmlrom_gb;
   SuperFamicom::MappedRAM *sram;
 
   Emulator::Interface *iface;
@@ -136,8 +139,17 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  void loadROM(unsigned id, const string &) {
+  void loadROM(unsigned id) {
     memorystream stream(rom_data, rom_size);
+    iface->load(id, stream);
+  }
+
+  void loadSGBROMManifest(unsigned id) {
+    iface->load(id, xmlrom_gb);
+  }
+
+  void loadSGBROM(unsigned id) {
+    memorystream stream(gb_rom_data, gb_rom_size);
     iface->load(id, stream);
   }
 
@@ -147,12 +159,18 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   void loadRequest(unsigned id, const string &p) {
+    fprintf(stderr, "[bSNES]: ID %u, Request \"%s\".\n", id, (const char*)p);
     switch(id) {
       case SuperFamicom::ID::ROM:
       case SuperFamicom::ID::SuperFXROM:
       case SuperFamicom::ID::SA1ROM:
       case SuperFamicom::ID::SDD1ROM:
-        loadROM(id, p);
+        fprintf(stderr, "[bSNES]: Load ROM.\n");
+        loadROM(id);
+        break;
+
+      case SuperFamicom::ID::SuperGameBoyROM:
+        loadSGBROM(id);
         break;
 
       // SRAM. Have to special case for all chips ...
@@ -172,13 +190,31 @@ struct Callbacks : Emulator::Interface::Bind {
         sram = &SuperFamicom::obc1.ram;
         break;
 
+      // SGB RAM is handled explicitly.
+      case SuperFamicom::ID::SuperGameBoyRAM:
+        break;
+
       case SuperFamicom::ID::IPLROM:
         loadIPLROM(id, p);
         break;
 
       default:
+        fprintf(stderr, "[bSNES]: Load BIOS.\n");
         loadBIOS(id, p);
         break;
+    }
+    fprintf(stderr, "[bSNES]: Complete load request.\n");
+  }
+
+  void loadRequest(unsigned id, const string &p, const string &manifest) {
+    switch (id) {
+      case SuperFamicom::ID::SuperGameBoy:
+        fprintf(stderr, "[bSNES]: Loading GB ROM.\n");
+        loadSGBROMManifest(id);
+        break;
+
+      default:
+        fprintf(stderr, "[bSNES]: Didn't do anything with loadRequest (3 arg).\n");
     }
   }
 
@@ -276,6 +312,7 @@ void retro_init(void) {
   GameBoy::interface = &core_gb_interface;
 
   core_interface.init();
+  core_gb_interface.init();
 
   SuperFamicom::system.init();
   SuperFamicom::input.connect(SuperFamicom::Controller::Port1, SuperFamicom::Input::Device::Joypad);
@@ -433,20 +470,20 @@ static bool snes_load_cartridge_super_game_boy(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size,
   const char *dmg_xml, const uint8_t *dmg_data, unsigned dmg_size
 ) {
-#if 0
-  string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : GameBoyCartridge((uint8_t*)dmg_data, dmg_size).markup;
-  //fprintf(stderr, "[bSNES]: Markup: %s\n", (const char*)xmlrom);
+  string xmlrom_sgb = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
+  string xmlrom_gb  = (dmg_xml && *dmg_xml) ? string(dmg_xml) : GameBoyCartridge((uint8_t*)dmg_data, dmg_size).markup;
+  fprintf(stderr, "[bSNES]: Markup SGB: %s\n", (const char*)xmlrom_sgb);
+  fprintf(stderr, "[bSNES]: Markup GB: %s\n", (const char*)xmlrom_gb);
 
-  core_bind.rom_data = rom_data;
-  core_bind.rom_size = rom_size;
+  core_bind.rom_data    = rom_data;
+  core_bind.rom_size    = rom_size;
   core_bind.gb_rom_data = dmg_data;
   core_bind.gb_rom_size = dmg_size;
+  core_bind.xmlrom_gb   = xmlrom_gb;
 
-  SuperFamicom::cartridge.load_super_game_boy(xmlrom);
+  SuperFamicom::cartridge.load(xmlrom_sgb);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
-#endif
-  return false;
 }
 
 bool retro_load_game(const struct retro_game_info *info) {
