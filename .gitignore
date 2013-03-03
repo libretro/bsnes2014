@@ -1,7 +1,7 @@
-purify/*.o
 purify/purify
-purify/analyze-gba
-ananke/ananke.o
+purify/ananke.dll
+purify/phoenix.dll
+purify/purify.exe
 ananke/libananke.so
 higan/out/libretro.so
 higan/out/retro.dll
