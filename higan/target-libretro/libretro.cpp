@@ -165,6 +165,8 @@ struct Callbacks : Emulator::Interface::Bind {
       case SuperFamicom::ID::SuperFXROM:
       case SuperFamicom::ID::SA1ROM:
       case SuperFamicom::ID::SDD1ROM:
+      case SuperFamicom::ID::HitachiDSPROM:
+      case SuperFamicom::ID::SPC7110PROM:
         fprintf(stderr, "[bSNES]: Load ROM.\n");
         loadROM(id);
         break;
@@ -188,6 +190,12 @@ struct Callbacks : Emulator::Interface::Bind {
         break;
       case SuperFamicom::ID::OBC1RAM:
         sram = &SuperFamicom::obc1.ram;
+        break;
+      case SuperFamicom::ID::HitachiDSPRAM:
+        sram = &SuperFamicom::hitachidsp.ram;
+        break;
+      case SuperFamicom::ID::SPC7110RAM:
+        sram = &SuperFamicom::spc7110.ram;
         break;
 
       // SGB RAM is handled explicitly.
