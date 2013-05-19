@@ -5,7 +5,7 @@ include sfc/Makefile
 include gb/Makefile
 output := libretro
 
-ifeq ($(platform),x)
+ifeq ($(platform),unix)
   flags += -fPIC
 else ifeq ($(platform),osx)
   flags += -fPIC
@@ -20,7 +20,7 @@ obj/libretro.o: $(ui)/libretro.cpp $(ui)/*
 
 #targets
 build: $(objects)
-ifeq ($(platform),x)
+ifeq ($(platform),unix)
 	$(cpp) -o out/bsnes_libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
 else ifeq ($(platform),osx)
 	$(cpp) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
@@ -29,7 +29,7 @@ else ifeq ($(platform),win)
 endif
 
 install:
-ifeq ($(platform),x)
+ifeq ($(platform),unix)
 	install -D -m 755 out/bsnes_libretro.so $(DESTDIR)$(prefix)/lib/bsnes_libretro.so
 else ifeq ($(platform),osx)
 	cp out/bsnes_libretro.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro.dylib

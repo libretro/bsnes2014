@@ -29,7 +29,7 @@ ifeq ($(platform),)
     platform := osx
     delete = rm -f $1
   else
-    platform := x
+    platform := unix
     delete = rm -f $1
   endif
 endif
