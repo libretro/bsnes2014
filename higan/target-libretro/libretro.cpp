@@ -55,7 +55,9 @@ struct Callbacks : Emulator::Interface::Bind {
   const uint8_t *gb_rom_data;
   unsigned gb_rom_size;
   string xmlrom_gb;
-  SuperFamicom::MappedRAM *sram;
+
+  void *sram;
+  unsigned sram_size;
 
   Emulator::Interface *iface;
   string basename;
@@ -177,25 +179,40 @@ struct Callbacks : Emulator::Interface::Bind {
 
       // SRAM. Have to special case for all chips ...
       case SuperFamicom::ID::RAM:
-        sram = &SuperFamicom::cartridge.ram;
+        sram = SuperFamicom::cartridge.ram.data();
+        sram_size = SuperFamicom::cartridge.ram.size();
         break;
       case SuperFamicom::ID::SuperFXRAM:
-        sram = &SuperFamicom::superfx.ram;
+        sram = SuperFamicom::superfx.ram.data();
+        sram_size = SuperFamicom::superfx.ram.size();
         break;
       case SuperFamicom::ID::SA1BWRAM:
-        sram = &SuperFamicom::sa1.bwram;
+        sram = SuperFamicom::sa1.bwram.data();
+        sram_size = SuperFamicom::sa1.bwram.size();
         break;
       case SuperFamicom::ID::SDD1RAM:
-        sram = &SuperFamicom::sdd1.ram;
+        sram = SuperFamicom::sdd1.ram.data();
+        sram_size = SuperFamicom::sdd1.ram.size();
         break;
       case SuperFamicom::ID::OBC1RAM:
-        sram = &SuperFamicom::obc1.ram;
+        sram = SuperFamicom::obc1.ram.data();
+        sram_size = SuperFamicom::obc1.ram.size();
         break;
       case SuperFamicom::ID::HitachiDSPRAM:
-        sram = &SuperFamicom::hitachidsp.ram;
+        sram = SuperFamicom::hitachidsp.ram.data();
+        sram_size = SuperFamicom::hitachidsp.ram.size();
+        break;
+      case SuperFamicom::ID::ArmDSPRAM:
+        sram = SuperFamicom::armdsp.programRAM;
+        sram_size = 16 * 1024 * sizeof(SuperFamicom::armdsp.programRAM[0]);
+        break;
+      case SuperFamicom::ID::Nec96050DSPRAM:
+        sram = SuperFamicom::necdsp.dataRAM;
+        sram_size = sizeof(SuperFamicom::necdsp.dataRAM);
         break;
       case SuperFamicom::ID::SPC7110RAM:
-        sram = &SuperFamicom::spc7110.ram;
+        sram = SuperFamicom::spc7110.ram.data();
+        sram_size = SuperFamicom::spc7110.ram.size();
         break;
 
       // SGB RAM is handled explicitly.
@@ -573,6 +590,8 @@ bool retro_load_game_special(unsigned game_type,
 
 void retro_unload_game(void) {
   SuperFamicom::cartridge.unload();
+  core_bind.sram = nullptr;
+  core_bind.sram_size = 0;
 }
 
 unsigned retro_get_region(void) {
@@ -584,7 +603,7 @@ void* retro_get_memory_data(unsigned id) {
 
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
-      return core_bind.sram ? core_bind.sram->data() : nullptr;
+      return core_bind.sram;
     case RETRO_MEMORY_RTC:
       return nullptr;
     case RETRO_MEMORY_SNES_BSX_RAM:
@@ -617,8 +636,7 @@ size_t retro_get_memory_size(unsigned id) {
 
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
-      if (core_bind.sram)
-         size = core_bind.sram->size();
+      size = core_bind.sram_size;
       fprintf(stderr, "[bSNES]: SRAM memory size: %u.\n", (unsigned)size);
       break;
     case RETRO_MEMORY_RTC:
