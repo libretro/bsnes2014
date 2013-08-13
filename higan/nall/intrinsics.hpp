@@ -45,7 +45,7 @@ struct Intrinsics {
 
 /* Endian detection */
 
-#if defined(__i386__) || defined(__amd64__) || defined(_M_IX86) || defined(_M_AMD64)
+#if defined(__i386__) || defined(__amd64__) || defined(_M_IX86) || defined(_M_AMD64) || defined(__ARM_EABI__)
   #define ENDIAN_LSB
   #define ARCH_LSB
   Intrinsics::Endian Intrinsics::endian() { return Intrinsics::Endian::LSB; }
