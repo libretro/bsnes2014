@@ -1,4 +1,6 @@
-ananke/libananke.so
-higan/out/libretro.so
-higan/out/retro.dll
-higan/out/libretro.dylib
+*.so
+*.dylib
+*.dll
+*.o
+/target-libretro/libs
+/target-libretro/obj
