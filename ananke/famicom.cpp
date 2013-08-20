@@ -8,14 +8,14 @@ void Ananke::copyFamicomSaves(const string &pathname) {
 
 string Ananke::createFamicomHeuristic(vector<uint8_t> &buffer) {
   string pathname = {
-    userpath(), "Emulation/Famicom/",
+    libraryPath, "Famicom/",
     nall::basename(information.name),
-    " (!).fc/"
+    ".fc/"
   };
   directory::create(pathname);
 
   FamicomCartridge info(buffer.data(), buffer.size());
-  string markup = info.markup();
+  string markup = {"unverified\n\n", info.markup};
   markup.append("\ninformation\n  title: ", nall::basename(information.name), "\n");
   if(!information.manifest.empty()) markup = information.manifest;  //override with embedded beat manifest, if one exists
 

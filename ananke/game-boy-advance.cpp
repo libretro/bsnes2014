@@ -14,14 +14,14 @@ void Ananke::copyGameBoyAdvanceSaves(const string &pathname) {
 
 string Ananke::createGameBoyAdvanceHeuristic(vector<uint8_t> &buffer) {
   string pathname = {
-    userpath(), "Emulation/Game Boy Advance/",
+    libraryPath, "Game Boy Advance/",
     nall::basename(information.name),
-    " (!).gba/"
+    ".gba/"
   };
   directory::create(pathname);
 
   GameBoyAdvanceCartridge info(buffer.data(), buffer.size());
-  string markup = info.markup;
+  string markup = {"unverified\n\n", info.markup};
   markup.append("\ninformation\n  title: ", nall::basename(information.name), "\n");
   if(!information.manifest.empty()) markup = information.manifest;  //override with embedded beat manifest, if one exists
 

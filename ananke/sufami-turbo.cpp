@@ -8,7 +8,7 @@ void Ananke::copySufamiTurboSaves(const string &pathname) {
 
 string Ananke::createSufamiTurboDatabase(vector<uint8_t> &buffer, Markup::Node &document, const string &manifest) {
   string pathname = {
-    userpath(), "Emulation/Sufami Turbo/",
+    libraryPath, "Sufami Turbo/",
     document["release/information/name"].text(),
     " (", document["release/information/region"].text(), ")",
     " (", document["release/information/revision"].text(), ")",
@@ -31,13 +31,15 @@ string Ananke::createSufamiTurboDatabase(vector<uint8_t> &buffer, Markup::Node &
 
 string Ananke::createSufamiTurboHeuristic(vector<uint8_t> &buffer) {
   string pathname = {
-    userpath(), "Emulation/Sufami Turbo/",
+    libraryPath, "Sufami Turbo/",
     nall::basename(information.name),
-    " (!).st/"
+    ".st/"
   };
   directory::create(pathname);
 
   file::write({pathname, "manifest.bml"}, {
+    "unverified\n",
+    "\n",
     "cartridge\n",
     "  rom name=program.rom size=0x", hex(buffer.size()), "\n",
     "  ram name=save.ram size=0x2000\n",
