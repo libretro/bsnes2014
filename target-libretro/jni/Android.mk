@@ -60,7 +60,9 @@ LOCAL_SRC_FILES += $(SRCDIR)/libco/libco.c \
 						 $(SRCDIR)/sfc/memory/memory.cpp \
 						 $(SRCDIR)/sfc/chip/icd2/icd2.cpp \
 						 $(SRCDIR)/sfc/chip/bsx/bsx.cpp \
-						 $(SRCDIR)/sfc/chip/sufamiturbo/sufamiturbo.cpp \
+						 $(SRCDIR)/sfc/slot/sufamiturbo/sufamiturbo.cpp \
+						 $(SRCDIR)/sfc/base/satellaview/satellaview.cpp \
+						 $(SRCDIR)/sfc/slot/satellaview/satellaview.cpp \
 						 $(SRCDIR)/sfc/chip/nss/nss.cpp \
 						 $(SRCDIR)/sfc/chip/event/event.cpp \
 						 $(SRCDIR)/sfc/chip/sa1/sa1.cpp \
