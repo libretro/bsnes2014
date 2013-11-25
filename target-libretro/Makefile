@@ -9,6 +9,8 @@ ifeq ($(platform),unix)
   flags += -fPIC
 else ifeq ($(platform),osx)
   flags += -fPIC
+else ifeq ($(platform),ios)
+  flags += -fPIC
 else ifeq ($(platform),win)
 endif
 
@@ -24,6 +26,8 @@ obj/libretro.o: $(ui)/libretro.cpp $(ui)/*
 build: $(objects)
 ifeq ($(platform),unix)
 	$(compiler) -o out/bsnes_libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
+else ifeq ($(platform),ios)
+	$(compiler) -o out/bsnes_libretro_ios.dylib -dynamiclib $(objects)
 else ifeq ($(platform),osx)
 	$(compiler) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
 else ifeq ($(platform),win)
@@ -35,6 +39,8 @@ ifeq ($(platform),unix)
 	install -D -m 755 out/bsnes_libretro.so $(DESTDIR)$(prefix)/lib/bsnes_libretro.so
 else ifeq ($(platform),osx)
 	cp out/bsnes_libretro.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro.dylib
+else ifeq ($(platform),ios)
+	cp out/bsnes_libretro_io.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro_ios.dylib
 endif
 
 uninstall:
@@ -42,5 +48,7 @@ ifeq ($(platform),x)
 	rm $(DESTDIR)$(prefix)/lib/bsnes_libretro.so
 else ifeq ($(platform),osx)
 	rm /usr/local/lib/bsnes_libretro.dylib
+else ifeq ($(platform),ios)
+	rm /usr/local/lib/bsnes_libretro_ios.dylib
 endif
 
