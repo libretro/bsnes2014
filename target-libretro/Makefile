@@ -8,7 +8,7 @@ output := libretro
 ifeq ($(platform),unix)
   flags += -fPIC
 else ifeq ($(platform),osx)
-  flags += -fPIC
+  flags += -arch armv7 -marm -fPIC -isysroot $(IOSSDK) -DHAVE_POSIX_MEMALIGN=1 -w
 else ifeq ($(platform),ios)
   flags += -fPIC
 else ifeq ($(platform),win)
@@ -27,7 +27,7 @@ build: $(objects)
 ifeq ($(platform),unix)
 	$(compiler) -o out/bsnes_libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
 else ifeq ($(platform),ios)
-	$(compiler) -o out/bsnes_libretro_ios.dylib -dynamiclib $(objects)
+	$(compiler) -o out/bsnes_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
 else ifeq ($(platform),osx)
 	$(compiler) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
 else ifeq ($(platform),win)
@@ -40,7 +40,7 @@ ifeq ($(platform),unix)
 else ifeq ($(platform),osx)
 	cp out/bsnes_libretro.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro.dylib
 else ifeq ($(platform),ios)
-	cp out/bsnes_libretro_io.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro_ios.dylib
+	cp out/bsnes_libretro_ios.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro_ios.dylib
 endif
 
 uninstall:

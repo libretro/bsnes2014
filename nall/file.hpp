@@ -8,6 +8,10 @@
 #include <nall/windows/utf8.hpp>
 #include <nall/stream/memory.hpp>
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#endif
+
 namespace nall {
 
 inline FILE* fopen_utf8(const string& filename, const string& mode) {
@@ -226,7 +230,10 @@ struct file {
   }
 
   static bool exists(const string& filename) {
-    #if !defined(_WIN32)
+    #if defined(__APPLE__) && TARGET_OS_IPHONE
+    struct stat data;
+    if(stat(filename, &data) != 0) return false;
+    #elif !defined(_WIN32)
     struct stat64 data;
     if(stat64(filename, &data) != 0) return false;
     #else
@@ -238,7 +245,10 @@ struct file {
   }
 
   static uintmax_t size(const string& filename) {
-    #if !defined(_WIN32)
+    #if defined(__APPLE__) && TARGET_OS_IPHONE
+    struct stat data;
+    if(stat(filename, &data) != 0) return false;
+    #elif !defined(_WIN32)
     struct stat64 data;
     stat64(filename, &data);
     #else
@@ -249,7 +259,10 @@ struct file {
   }
 
   static time_t timestamp(const string& filename, file::time mode = file::time::create) {
-    #if !defined(_WIN32)
+    #if defined(__APPLE__) && TARGET_OS_IPHONE
+    struct stat data;
+    if(stat(filename, &data) != 0) return false;
+    #elif !defined(_WIN32)
     struct stat64 data;
     stat64(filename, &data);
     #else
