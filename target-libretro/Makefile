@@ -8,9 +8,9 @@ output := libretro
 ifeq ($(platform),unix)
   flags += -fPIC
 else ifeq ($(platform),osx)
-  flags += -arch armv7 -marm -fPIC -isysroot $(IOSSDK) -DHAVE_POSIX_MEMALIGN=1 -w
-else ifeq ($(platform),ios)
   flags += -fPIC
+else ifeq ($(platform),ios)
+  flags += -arch armv7 -marm -fPIC -isysroot $(IOSSDK) -DHAVE_POSIX_MEMALIGN=1 -w
 else ifeq ($(platform),win)
 endif
 
