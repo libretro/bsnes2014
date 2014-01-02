@@ -90,7 +90,7 @@ LOCAL_SRC_FILES += $(SRCDIR)/libco/libco.c \
 						 $(SRCDIR)/target-libretro/libretro.cpp
 
 LOCAL_CPPFLAGS += -std=gnu++11 -fexceptions -frtti -Wno-literal-suffix 
-LOCAL_CFLAGS += -O3 -fomit-frame-pointer -DPROFILE_PERFORMANCE -ffast-math -D__LIBRETRO__
+LOCAL_CFLAGS += -O3 -fomit-frame-pointer -ffast-math -D__LIBRETRO__
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../..
 
 include $(BUILD_SHARED_LIBRARY)
