@@ -11,7 +11,6 @@ else ifeq ($(platform),osx)
   flags += -fPIC
 else ifeq ($(platform),ios)
   flags += -arch armv7 -marm -fPIC -isysroot $(IOSSDK) -DHAVE_POSIX_MEMALIGN=1 -w
-else ifeq ($(platform),win)
 endif
 
 flags += -D__LIBRETRO__
