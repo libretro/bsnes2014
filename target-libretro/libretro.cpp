@@ -1,8 +1,10 @@
 #include "libretro.h"
 #include <sfc/sfc.hpp>
 #include <nall/stream/mmap.hpp>
+#include <nall/stream/file.hpp>
 #include "../ananke/heuristics/super-famicom.hpp"
 #include "../ananke/heuristics/game-boy.hpp"
+#include <string>
 using namespace nall;
 
 const uint8 iplrom[64] = {
@@ -48,6 +50,7 @@ struct Callbacks : Emulator::Interface::Bind {
   retro_input_state_t pinput_state;
   retro_environment_t penviron;
   bool overscan;
+  bool manifest;
 
   bool load_request_error;
   const uint8_t *rom_data;
@@ -118,14 +121,23 @@ struct Callbacks : Emulator::Interface::Bind {
     return pinput_state(port, snes_to_retro(device), 0, snes_to_retro(device, id));
   }
 
-  void loadBIOS(unsigned id, string p) {
+  void saveRequest(unsigned id, string p) {
+    if (manifest) {
+      fprintf(stderr, "[bSNES]: [Save]: ID %u, Request \"%s\".\n", id, (const char*)p);
+      string save_path = {path(0), p};
+      filestream stream(save_path, file::mode::write);
+      iface->save(id, stream);
+    }
+  }
+
+  void loadFile(unsigned id, string p) {
     // Look for BIOS in system directory as well.
     const char *dir = 0;
     penviron(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir);
 
     string load_path = {path(0), p};
-    if(file::exists(load_path)) {
-      mmapstream stream(load_path);
+    if(manifest || file::exists(load_path)) {
+      filestream stream(load_path, file::mode::read);
       iface->load(id, stream);
     } else if(dir) {
       load_path = {dir, "/", p};
@@ -167,16 +179,33 @@ struct Callbacks : Emulator::Interface::Bind {
     iface->load(id, stream);
   }
 
-  void loadRequest(unsigned id, string p) {
-    fprintf(stderr, "[bSNES]: ID %u, Request \"%s\".\n", id, (const char*)p);
+  void loadRequestManifest(unsigned id, const string& p) {
+    fprintf(stderr, "[bSNES]: [Manifest]: ID %u, Request \"%s\".\n", id, (const char*)p);
+    switch(id) {
+      case SuperFamicom::ID::IPLROM:
+        loadIPLROM(id);
+        break;
+
+      case SuperFamicom::ID::Manifest:
+        loadManifest(id);
+        break;
+
+      default:
+        loadFile(id, p);
+        break;
+    }
+  }
+
+  void loadRequestMemory(unsigned id, const string& p) {
+    fprintf(stderr, "[bSNES]: [Memory]: ID %u, Request \"%s\".\n", id, (const char*)p);
     switch(id) {
       case SuperFamicom::ID::Manifest:
-         loadManifest(id);
-         break;
+        loadManifest(id);
+        break;
 
       case SuperFamicom::ID::SuperGameBoyManifest:
-         loadSGBROMManifest(id);
-         break;
+        loadSGBROMManifest(id);
+        break;
 
       case SuperFamicom::ID::ROM:
       case SuperFamicom::ID::SuperFXROM:
@@ -240,9 +269,16 @@ struct Callbacks : Emulator::Interface::Bind {
 
       default:
         fprintf(stderr, "[bSNES]: Load BIOS.\n");
-        loadBIOS(id, p);
+        loadFile(id, p);
         break;
     }
+  }
+
+  void loadRequest(unsigned id, string p) {
+    if (manifest)
+       loadRequestManifest(id, p);
+    else
+       loadRequestMemory(id, p);
     fprintf(stderr, "[bSNES]: Complete load request.\n");
   }
 
@@ -530,6 +566,9 @@ static bool snes_load_cartridge_super_game_boy(
 }
 
 bool retro_load_game(const struct retro_game_info *info) {
+  // Support loading a manifest directly.
+  core_bind.manifest = info->path && string(info->path).endswith(".bml");
+
   const uint8_t *data = (const uint8_t*)info->data;
   size_t size = info->size;
   if ((size & 0x7ffff) == 512) {
@@ -541,23 +580,28 @@ bool retro_load_game(const struct retro_game_info *info) {
     core_bind.load_request_error = false;
     core_bind.basename = info->path;
 
-    char *dot = (char*)strrchr(core_bind.basename, '/');
-    if (!dot)
-       dot = (char*)strrchr(core_bind.basename, '\\');
-
-    if (dot)
-      dot[1] = '\0';
+    char *posix_slash = (char*)strrchr(core_bind.basename, '/');
+    char *win_slash = (char*)strrchr(core_bind.basename, '\\');
+    if (posix_slash && !win_slash)
+       posix_slash[1] = '\0';
+    else if (win_slash && !posix_slash)
+       win_slash = '\0';
+    else if (posix_slash && win_slash)
+       max(posix_slash, win_slash)[1] = '\0';
     else
       core_bind.basename = "./";
   }
 
   core_interface.mode = SuperFamicomCartridge::ModeNormal;
-  return snes_load_cartridge_normal(info->meta, data, size);
+  std::string manifest;
+  if (core_bind.manifest)
+    manifest = std::string((const char*)info->data, info->size); // Might not be 0 terminated.
+  return snes_load_cartridge_normal(core_bind.manifest ? manifest.data() : info->meta, data, size);
 }
 
 bool retro_load_game_special(unsigned game_type,
       const struct retro_game_info *info, size_t num_info) {
-
+  core_bind.manifest = false;
   const uint8_t *data = (const uint8_t*)info[0].data;
   size_t size = info[0].size;
   if ((size & 0x7ffff) == 512) {
@@ -569,14 +613,17 @@ bool retro_load_game_special(unsigned game_type,
   if (info[0].path) {
     core_bind.load_request_error = false;
     core_bind.basename = info[0].path;
-    char *dot = (char*)strrchr(core_bind.basename, '/');
-    if (!dot)
-       dot = (char*)strrchr(core_bind.basename, '\\');
 
-    if (dot)
-      dot[1] = '\0';
+    char *posix_slash = (char*)strrchr(core_bind.basename, '/');
+    char *win_slash = (char*)strrchr(core_bind.basename, '\\');
+    if (posix_slash && !win_slash)
+       posix_slash[1] = '\0';
+    else if (win_slash && !posix_slash)
+       win_slash = '\0';
+    else if (posix_slash && win_slash)
+       max(posix_slash, win_slash)[1] = '\0';
     else
-      core_bind.basename = "";
+      core_bind.basename = "./";
   }
 
   switch (game_type) {
@@ -607,6 +654,7 @@ bool retro_load_game_special(unsigned game_type,
 }
 
 void retro_unload_game(void) {
+  core_bind.iface->save();
   SuperFamicom::cartridge.unload();
   core_bind.sram = nullptr;
   core_bind.sram_size = 0;
