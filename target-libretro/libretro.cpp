@@ -666,6 +666,7 @@ unsigned retro_get_region(void) {
 
 void* retro_get_memory_data(unsigned id) {
   if(SuperFamicom::cartridge.loaded() == false) return 0;
+  if(core_bind.manifest) return 0;
 
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
@@ -698,6 +699,7 @@ void* retro_get_memory_data(unsigned id) {
 
 size_t retro_get_memory_size(unsigned id) {
   if(SuperFamicom::cartridge.loaded() == false) return 0;
+  if(core_bind.manifest) return 0;
   size_t size = 0;
 
   switch(id) {
