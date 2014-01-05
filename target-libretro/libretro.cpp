@@ -453,7 +453,7 @@ void retro_get_system_info(struct retro_system_info *info) {
   static string version("v", Emulator::Version, " (", Emulator::Profile, ")");
   info->library_name     = "bSNES";
   info->library_version  = version;
-  info->valid_extensions = "sfc|smc";
+  info->valid_extensions = "sfc|smc|bml";
   info->need_fullpath    = false;
 }
 
