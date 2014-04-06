@@ -114,7 +114,9 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  void videoRefresh(const uint32_t *data, unsigned pitch, unsigned width, unsigned height) {
+  uint32_t video_buffer[512 * 480];
+
+  void videoRefresh(const uint32_t *palette, const uint32_t *data, unsigned pitch, unsigned width, unsigned height) {
     if (!overscan) {
       data += 8 * 1024;
 
@@ -124,7 +126,12 @@ struct Callbacks : Emulator::Interface::Bind {
         height = 448;
     }
 
-    pvideo_refresh(data, width, height, pitch);
+    uint32_t *ptr = video_buffer;
+    for (unsigned y = 0; y < height; y++, data += pitch >> 2, ptr += width)
+       for (unsigned x = 0; x < width; x++)
+          ptr[x] = palette[data[x]];
+
+    pvideo_refresh(video_buffer, width, height, width << 2);
     pinput_poll();
   }
 
@@ -314,7 +321,7 @@ struct Callbacks : Emulator::Interface::Bind {
     return string(basename);
   }
 
-  uint32_t videoColor(unsigned, uint16_t r, uint16_t g, uint16_t b) {
+  uint32_t videoColor(unsigned, uint16_t, uint16_t r, uint16_t g, uint16_t b) {
     r >>= 8;
     g >>= 8;
     b >>= 8;
@@ -332,14 +339,14 @@ struct Interface : public SuperFamicom::Interface {
   Interface(); 
 
   void init() {
-     SuperFamicom::video.generate_palette();
+     SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Emulation);
   }
 };
 
 struct GBInterface : public GameBoy::Interface {
   GBInterface() { bind = &core_bind; }
   void init() {
-     SuperFamicom::video.generate_palette();
+     SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Emulation);
   }
 };
 
@@ -351,7 +358,8 @@ Interface::Interface() {
   core_bind.iface = &core_interface;
 }
 
-void Interface::setCheats(const lstring &list) {
+void Interface::setCheats(const lstring &) {
+#if 0
   if(core_interface.mode == SuperFamicomCartridge::ModeSuperGameBoy) {
     GameBoy::cheat.reset();
     for(auto &code : list) {
@@ -381,6 +389,7 @@ void Interface::setCheats(const lstring &list) {
   }
 
   SuperFamicom::cheat.synchronize();
+#endif
 }
 
 unsigned retro_api_version(void) {
@@ -632,7 +641,7 @@ static bool snes_load_cartridge_super_game_boy(
 
 bool retro_load_game(const struct retro_game_info *info) {
   // Support loading a manifest directly.
-  core_bind.manifest = info->path && string(info->path).endswith(".bml");
+  core_bind.manifest = info->path && string(info->path).endsWith(".bml");
 
   const uint8_t *data = (const uint8_t*)info->data;
   size_t size = info->size;

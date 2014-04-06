@@ -10,20 +10,17 @@
 [space] :=
 [space] +=
 
-#####
 # platform detection
-#####
-
 ifeq ($(platform),)
-  uname := $(shell uname -a)
+  uname := $(shell uname -s)
   ifeq ($(uname),)
-    platform := win
+    platform := windows
     delete = del $(subst /,\,$1)
   else ifneq ($(findstring Windows,$(uname)),)
-    platform := win
+    platform := windows
     delete = del $(subst /,\,$1)
   else ifneq ($(findstring CYGWIN,$(uname)),)
-    platform := win
+    platform := windows
     delete = del $(subst /,\,$1)
   else ifneq ($(findstring Darwin,$(uname)),)
     platform := osx
@@ -34,8 +31,9 @@ ifeq ($(platform),)
   endif
 endif
 
+# compiler detection
 ifeq ($(compiler),)
-  ifeq ($(platform),win)
+  ifeq ($(platform),windows)
     compiler := g++
   else ifeq ($(platform),osx)
     compiler := clang++ -stdlib=libc++
@@ -48,9 +46,7 @@ ifeq ($(prefix),)
   prefix := /usr/local
 endif
 
-#####
 # function rwildcard(directory, pattern)
-#####
 rwildcard = \
   $(strip \
     $(filter $(if $2,$2,%), \
@@ -62,9 +58,7 @@ rwildcard = \
     ) \
   )
 
-#####
 # function strtr(source, from, to)
-#####
 strtr = \
   $(eval __temp := $1) \
   $(strip \
@@ -77,19 +71,13 @@ strtr = \
     $(__temp) \
   )
 
-#####
 # function strupper(source)
-#####
 strupper = $(call strtr,$1,$([a-z]),$([A-Z]))
 
-#####
 # function strlower(source)
-#####
 strlower = $(call strtr,$1,$([A-Z]),$([a-z]))
 
-#####
 # function strlen(source)
-#####
 strlen = \
   $(eval __temp := $(subst $([space]),_,$1)) \
   $(words \
@@ -104,12 +92,8 @@ strlen = \
     ) \
   )
 
-#####
 # function streq(source)
-#####
 streq = $(if $(filter-out xx,x$(subst $1,,$2)$(subst $2,,$1)x),,1)
 
-#####
 # function strne(source)
-#####
 strne = $(if $(filter-out xx,x$(subst $1,,$2)$(subst $2,,$1)x),1,)
