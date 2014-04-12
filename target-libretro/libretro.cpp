@@ -21,6 +21,11 @@
 #define RETRO_GAME_TYPE_SUFAMI_TURBO    0x103
 #define RETRO_GAME_TYPE_SUPER_GAME_BOY  0x104
 
+#define RETRO_DEVICE_JOYPAD_MULTITAP       RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
+#define RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE  RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_LIGHTGUN, 0)
+#define RETRO_DEVICE_LIGHTGUN_JUSTIFIER    RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_LIGHTGUN, 1)
+#define RETRO_DEVICE_LIGHTGUN_JUSTIFIERS   RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_LIGHTGUN, 2)
+
 using namespace nall;
 
 const uint8 iplrom[64] = {
@@ -336,7 +341,7 @@ struct Interface : public SuperFamicom::Interface {
 
   void setCheats(const lstring &list = lstring());
 
-  Interface(); 
+  Interface();
 
   void init() {
      SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Emulation);
@@ -444,6 +449,28 @@ void retro_set_environment(retro_environment_t environ_cb)
    };
 
    environ_cb(RETRO_ENVIRONMENT_SET_SUBSYSTEM_INFO, (void*)subsystems);
+
+   static const struct retro_controller_description port_1[] = {
+      { "SNES Joypad", RETRO_DEVICE_JOYPAD },
+      { "SNES Mouse", RETRO_DEVICE_MOUSE },
+   };
+
+   static const struct retro_controller_description port_2[] = {
+      { "SNES Joypad", RETRO_DEVICE_JOYPAD },
+      { "SNES Mouse", RETRO_DEVICE_MOUSE },
+      { "Multitap", RETRO_DEVICE_JOYPAD_MULTITAP },
+      { "SuperScope", RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE },
+      { "Justifier", RETRO_DEVICE_LIGHTGUN_JUSTIFIER },
+      { "Justifiers", RETRO_DEVICE_LIGHTGUN_JUSTIFIERS },
+   };
+
+   static const struct retro_controller_info ports[] = {
+      { port_1, 2 },
+      { port_2, 6 },
+      { 0 },
+   };
+
+   environ_cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);
 }
 
 void retro_set_video_refresh(retro_video_refresh_t video_refresh) { core_bind.pvideo_refresh = video_refresh; }
