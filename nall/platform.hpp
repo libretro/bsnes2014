@@ -41,7 +41,11 @@ namespace Math {
   #undef interface
   #define dllexport __declspec(dllexport)
 #else
-  #include <endian.h>
+  #ifdef __APPLE__
+    #include <machine/endian.h>
+  #else
+    #include <endian.h>
+  #endif
   #include <unistd.h>
   #include <pwd.h>
   #define dllexport

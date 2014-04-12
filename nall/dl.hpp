@@ -60,9 +60,15 @@ inline void library::close() {
   handle = 0;
 }
 #elif defined(PLATFORM_MACOSX)
+static void junk_function() {}
 inline bool library::open(const string& name, const string& path) {
   if(handle) close();
   handle = (uintptr_t)dlopen(string(path, !path.empty() && !path.endsWith("/") ? "/" : "", "lib", name, ".dylib"), RTLD_LAZY);
+  if(!handle) {
+    Dl_info info;
+    dladdr((void*)&junk_function, &info);
+    handle = (uintptr_t)dlopen(string(parentdir(info.dli_fname), "lib", name, ".dylib"), RTLD_LAZY);
+  }
   if(!handle) handle = (uintptr_t)dlopen(string("/usr/local/lib/lib", name, ".dylib"), RTLD_LAZY);
   return handle;
 }

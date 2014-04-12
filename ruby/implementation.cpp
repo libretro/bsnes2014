@@ -6,8 +6,11 @@
   #include <X11/Xatom.h>
 #elif defined(PLATFORM_MACOSX)
   #define decimal CocoaDecimal
+  #pragma push_macro("noinline")
+  #undef noinline
   #include <Cocoa/Cocoa.h>
   #include <Carbon/Carbon.h>
+  #pragma pop_macro("noinline")
   #undef decimal
 #elif defined(PLATFORM_WINDOWS)
   #define _WIN32_WINNT 0x0501

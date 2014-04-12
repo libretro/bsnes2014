@@ -16,6 +16,7 @@ namespace ruby {
 
 struct pVideoCGL : OpenGL {
   RubyVideoCGL* view;
+  bool initialized;
 
   struct {
     NSView* handle;
@@ -144,21 +145,25 @@ struct pVideoCGL : OpenGL {
     }
 
     clear();
-    return true;
+    return initialized = true;
   }
 
   void term() {
-    OpenGL::term();
+    if (initialized) {
+      OpenGL::term();
 
-    @autoreleasepool {
-      [view removeFromSuperview];
-      [view release];
-      view = nil;
+      @autoreleasepool {
+        [view removeFromSuperview];
+        [view release];
+        view = nil;
+      }
     }
+    initialized = false;
   }
 
   pVideoCGL() {
     view = nil;
+    initialized = false;
 
     settings.handle = nil;
     settings.synchronize = false;
