@@ -344,14 +344,14 @@ struct Interface : public SuperFamicom::Interface {
   Interface();
 
   void init() {
-     SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Emulation);
+     SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Standard);
   }
 };
 
 struct GBInterface : public GameBoy::Interface {
   GBInterface() { bind = &core_bind; }
   void init() {
-     SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Emulation);
+     SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Standard);
   }
 };
 
