@@ -686,7 +686,7 @@ bool retro_load_game(const struct retro_game_info *info) {
     if (posix_slash && !win_slash)
        posix_slash[1] = '\0';
     else if (win_slash && !posix_slash)
-       win_slash = '\0';
+       win_slash[1] = '\0';
     else if (posix_slash && win_slash)
        max(posix_slash, win_slash)[1] = '\0';
     else
@@ -720,7 +720,7 @@ bool retro_load_game_special(unsigned game_type,
     if (posix_slash && !win_slash)
        posix_slash[1] = '\0';
     else if (win_slash && !posix_slash)
-       win_slash = '\0';
+       win_slash[1] = '\0';
     else if (posix_slash && win_slash)
        max(posix_slash, win_slash)[1] = '\0';
     else
