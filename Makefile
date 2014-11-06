@@ -40,6 +40,8 @@ ifeq ($(compiler),)
   compiler := g++
 endif
 
+ui := target-$(target)
+
 # platform
 ifeq ($(findstring libretro,$(ui)),)
   ifeq ($(platform),x)
@@ -61,8 +63,6 @@ ifeq ($(findstring libretro,$(ui)),)
     unknown_platform: help;
   endif
 endif
-
-ui := target-$(target)
 
 # implicit rules
 compile = \
