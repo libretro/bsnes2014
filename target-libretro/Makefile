@@ -41,6 +41,8 @@ else ifeq ($(platform),osx)
 	$(compiler) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
 else ifeq ($(platform),win)
 	$(compiler) -o out/bsnes_libretro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T -static-libgcc -static-libstdc++ -lws2_32
+else
+	$(error invalid platform: $(platform). valid platforms are: windows linux macosx ios bsd)
 endif
 
 install:
