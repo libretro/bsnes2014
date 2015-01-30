@@ -15,9 +15,9 @@ target  := ethos
 # compiler
 
 ifneq ($(debug),)
-  flags := -I. -O0 -g
+  flags := -I. -Ilibco -O0 -g
 else
-  flags := -I. -O3 -fomit-frame-pointer
+  flags := -I. -Ilibco -O3 -fomit-frame-pointer
 endif
 
 cflags := -std=gnu99 -xc
