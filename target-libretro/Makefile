@@ -38,7 +38,11 @@ ifeq ($(platform),unix)
 else ifeq ($(platform),ios)
 	$(compiler) -o out/bsnes_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
 else ifeq ($(platform),osx)
+ifdef ($(NOUNIVERSAL))
 	$(compiler) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
+else
+	$(compiler) $(ARCHFLAGS) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
+endif
 else ifeq ($(platform),win)
 	$(compiler) -o out/bsnes_libretro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T -static-libgcc -static-libstdc++ -lws2_32
 else
