@@ -165,6 +165,9 @@ uint8 EpsonRTC::read(unsigned addr) {
   if(addr == 2) {
     return ready << 7;
   }
+
+  // NOT REACHED
+  return 0;
 }
 
 void EpsonRTC::write(unsigned addr, uint8 data) {

@@ -31,6 +31,9 @@ void BSXCartridge::reset() {
 uint8 BSXCartridge::memory_access(bool write, Memory& memory, unsigned addr, uint8 data) {
   if(write == 0) return memory_read(memory, addr);
   memory_write(memory, addr, data);
+
+  // Return value on write isn't specified, let's fix that
+  return 0;
 }
 
 uint8 BSXCartridge::memory_read(Memory& memory, unsigned addr) {

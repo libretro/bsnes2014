@@ -39,7 +39,8 @@ void ArmDSP::enter() {
 }
 
 void ArmDSP::step(unsigned clocks) {
-  if(bridge.timer && --bridge.timer == 0);
+  if(bridge.timer && --bridge.timer == 0)
+    ;
   Coprocessor::step(clocks);
   synchronize_cpu();
 }
