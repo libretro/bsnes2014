@@ -25,7 +25,7 @@ uint8 SuperFX::bus_read(unsigned addr) {
     return ram.read(addr & ram_mask);
   }
 
-  // NOT REACHED
+  // TODO: invalid address, what does real hardware do?
   return 0;
 }
 

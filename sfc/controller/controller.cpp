@@ -35,8 +35,8 @@ void Controller::synchronize_cpu() {
 bool Controller::iobit() {
   if (port == Controller::Port1)
     return cpu.pio() & 0x40;
-
-  return cpu.pio() & 0x80;
+  else
+    return cpu.pio() & 0x80;
 }
 
 void Controller::iobit(bool data) {

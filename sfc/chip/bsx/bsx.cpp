@@ -32,7 +32,7 @@ uint8 BSXCartridge::memory_access(bool write, Memory& memory, unsigned addr, uin
   if(write == 0) return memory_read(memory, addr);
   memory_write(memory, addr, data);
 
-  // Return value on write isn't specified, let's fix that
+  // byuu returned nothing here (causing C++ to return 0)
   return 0;
 }
 

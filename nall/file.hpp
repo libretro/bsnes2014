@@ -198,7 +198,7 @@ struct file : varint {
     case index::relative:
         if (offset < 0 && -offset > req_offset)
             req_offset = 0;             //cannot seek before start of file
-		else
+        else
             req_offset += offset;
         break;
     }

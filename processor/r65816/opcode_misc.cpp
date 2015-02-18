@@ -77,8 +77,7 @@ L   op_io();
 }
 
 void R65816::op_wai() {
-  regs.wai = true;
-  while(regs.wai) {
+  while((regs.wai = true)) {
 L   op_io();
   }
   op_io();

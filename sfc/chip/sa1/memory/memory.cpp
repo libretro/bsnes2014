@@ -100,7 +100,7 @@ uint8 SA1::vbr_read(unsigned addr) {
     return iram.read(addr & 2047);
   }
 
-  // NOT REACHED
+  // TODO: invalid address, what does real hardware do here?
   return 0;
 }
 

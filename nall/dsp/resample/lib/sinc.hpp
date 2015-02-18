@@ -11,8 +11,8 @@ typedef float resample_samp_t;
 #if defined(__SSE__)
   #define SINCRESAMPLE_USE_SSE 1
   #ifndef __x86_64__
-    // Apple's clang doesn't have this extension on -arch i386
-    #if !defined(__APPLE__) && !defined(__clang__)
+    // clang may not have this extension (Apple's certainly doesn't)
+    #ifndef __clang__
       #undef RESAMPLE_SSEREGPARM
       #define RESAMPLE_SSEREGPARM __attribute__((sseregparm))
     #endif

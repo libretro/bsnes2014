@@ -122,7 +122,7 @@ void Video::update() {
     }
     break;
   default:
-	break;
+    break;
   }
 
   uint32_t* data = (uint32_t*)ppu.output;

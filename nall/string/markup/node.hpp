@@ -59,7 +59,7 @@ struct Node {
       case Comparator::LE: side = rule.split<1>("<="); break;
       case Comparator::GT: side = rule.split<1> (">"); break;
       case Comparator::GE: side = rule.split<1>(">="); break;
-      default: /* Shouldn't happen? */ break;
+      default: break;
       }
 
       string data = text();
@@ -76,9 +76,10 @@ struct Node {
       case Comparator::LE: if(numeral(data) <= numeral(side(1))) continue; break;
       case Comparator::GT: if(numeral(data)  > numeral(side(1))) continue; break;
       case Comparator::GE: if(numeral(data) >= numeral(side(1))) continue; break;
-      default: /* Shouldn't happen? */ break;
+      default: break;
       }
 
+      /* NOT REACHED */
       return false;
     }
 
