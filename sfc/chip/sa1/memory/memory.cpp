@@ -256,7 +256,7 @@ uint8 SA1::bitmap_read(unsigned addr) {
     }
   }
 
-  // Nothing was returned here
+  // NOT REACHED
   return 0;
 }
 

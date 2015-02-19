@@ -79,7 +79,7 @@ struct Node {
       default: break;
       }
 
-      /* NOT REACHED */
+      // NOT REACHED
       return false;
     }
 

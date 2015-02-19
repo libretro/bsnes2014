@@ -70,14 +70,14 @@ L rd.h = op_readlong(vectorN + 1);
 }
 
 void R65816::op_stp() {
-  regs.wai = true;
-  while(regs.wai) {
+  while((regs.wai = true)) {
 L   op_io();
   }
 }
 
 void R65816::op_wai() {
-  while((regs.wai = true)) {
+  regs.wai = true;
+  while(regs.wai) {
 L   op_io();
   }
   op_io();
