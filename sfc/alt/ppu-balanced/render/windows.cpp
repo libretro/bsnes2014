@@ -38,7 +38,7 @@ void PPU::build_window_table(uint8 bg, bool screen) {
       bool tmp = set;
       set = clr;
       clr = tmp;
-	}
+    }
     for(unsigned x = 0; x < 256; x++) {
       table[x] = (x >= window1_left && x <= window1_right) ? set : clr;
     }
@@ -50,7 +50,7 @@ void PPU::build_window_table(uint8 bg, bool screen) {
       bool tmp = set;
       set = clr;
       clr = tmp;
-	}
+    }
     for(unsigned x = 0; x < 256; x++) {
       table[x] = (x >= window2_left && x <= window2_right) ? set : clr;
     }
