@@ -20,15 +20,15 @@ ifeq ($(platform),windows)
   ruby += input.windows
 else ifeq ($(platform),macosx)
   ruby := video.cgl
-  ruby += audio-$(profile).openal
+  ruby += audio.openal
   ruby += input.carbon
 else ifeq ($(platform),linux)
   ruby := video.glx video.xv video.xshm video.sdl
-  ruby += audio.alsa audio-$(profile).openal audio-$(profile).oss audio.pulseaudio audio.pulseaudiosimple audio.ao
+  ruby += audio.alsa audio.openal audio.oss audio.pulseaudio audio.pulseaudiosimple audio.ao
   ruby += input.udev input.sdl input.x
 else ifeq ($(platform),bsd)
   ruby := video.glx
-  ruby += audio-$(profile).openal audio-$(profile).oss
+  ruby += audio.openal audio.oss
   ruby += input.x
 endif
 
