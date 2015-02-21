@@ -20,15 +20,15 @@ ifeq ($(platform),windows)
   ruby += input.windows
 else ifeq ($(platform),macosx)
   ruby := video.cgl
-  ruby += audio.openal
+  ruby += audio-$(profile).openal
   ruby += input.carbon
 else ifeq ($(platform),linux)
   ruby := video.glx video.xv video.xshm video.sdl
-  ruby += audio.alsa audio.openal audio.oss audio.pulseaudio audio.pulseaudiosimple audio.ao
+  ruby += audio.alsa audio-$(profile).openal audio-$(profile).oss audio.pulseaudio audio.pulseaudiosimple audio.ao
   ruby += input.udev input.sdl input.x
 else ifeq ($(platform),bsd)
   ruby := video.glx
-  ruby += audio.openal audio.oss
+  ruby += audio-$(profile).openal audio-$(profile).oss
   ruby += input.x
 endif
 
@@ -42,36 +42,36 @@ link += $(rubylink)
 
 # rules
 objects := $(ui_objects) $(objects)
-objects := $(patsubst %,obj/%.o,$(objects))
+objects := $(patsubst %,obj/%-$(profile).o,$(objects))
 
-obj/ui-ethos.o: $(ui)/ethos.cpp $(call rwildcard,$(ui)/)
-obj/ui-configuration.o: $(ui)/configuration/configuration.cpp $(call rwildcard,$(ui)/)
-obj/ui-interface.o: $(ui)/interface/interface.cpp $(call rwildcard,$(ui)/)
-obj/ui-utility.o: $(ui)/utility/utility.cpp $(call rwildcard,$(ui)/)
-obj/ui-input.o: $(ui)/input/input.cpp $(call rwildcard,$(ui)/)
-obj/ui-window.o: $(ui)/window/window.cpp $(call rwildcard,$(ui)/)
-obj/ui-general.o: $(ui)/general/general.cpp $(call rwildcard,$(ui)/)
-obj/ui-settings.o: $(ui)/settings/settings.cpp $(call rwildcard,$(ui)/)
-obj/ui-tools.o: $(ui)/tools/tools.cpp $(call rwildcard,$(ui)/)
+obj/ui-ethos-$(profile).o: $(ui)/ethos.cpp $(call rwildcard,$(ui)/)
+obj/ui-configuration-$(profile).o: $(ui)/configuration/configuration.cpp $(call rwildcard,$(ui)/)
+obj/ui-interface-$(profile).o: $(ui)/interface/interface.cpp $(call rwildcard,$(ui)/)
+obj/ui-utility-$(profile).o: $(ui)/utility/utility.cpp $(call rwildcard,$(ui)/)
+obj/ui-input-$(profile).o: $(ui)/input/input.cpp $(call rwildcard,$(ui)/)
+obj/ui-window-$(profile).o: $(ui)/window/window.cpp $(call rwildcard,$(ui)/)
+obj/ui-general-$(profile).o: $(ui)/general/general.cpp $(call rwildcard,$(ui)/)
+obj/ui-settings-$(profile).o: $(ui)/settings/settings.cpp $(call rwildcard,$(ui)/)
+obj/ui-tools-$(profile).o: $(ui)/tools/tools.cpp $(call rwildcard,$(ui)/)
 
-obj/ruby.o: ruby/ruby.cpp $(call rwildcard,ruby/*)
+obj/ruby-$(profile).o: ruby/ruby.cpp $(call rwildcard,ruby/*)
 	$(compiler) $(rubyflags) -c $< -o $@
 
-obj/phoenix.o: phoenix/phoenix.cpp $(call rwildcard,phoenix/*)
+obj/phoenix-$(profile).o: phoenix/phoenix.cpp $(call rwildcard,phoenix/*)
 	$(compiler) $(phoenixflags) -c $< -o $@
 
-obj/resource.o: $(ui)/resource.rc
+obj/resource-$(profile).o: $(ui)/resource.rc
 ifeq ($(arch),win32)
-	windres --target=pe-i386 $(ui)/resource.rc obj/resource.o
+	windres --target=pe-i386 $(ui)/resource.rc obj/resource-$(profile).o
 else
-	windres $(ui)/resource.rc obj/resource.o
+	windres $(ui)/resource.rc obj/resource-$(profile).o
 endif
 
 # targets
 build: $(objects)
 ifeq ($(platform),windows)
-	$(strip $(compiler) -shared -o out/phoenix.dll obj/phoenix.o $(phoenixlink))
-	$(strip $(compiler) -o out/$(name) $(subst obj/phoenix.o,,$(objects)) $(link) -Lout -lphoenix)
+	$(strip $(compiler) -shared -o out/phoenix.dll obj/phoenix-$(profile).o $(phoenixlink))
+	$(strip $(compiler) -o out/$(name) $(subst obj/phoenix-$(profile).o,,$(objects)) $(link) -Lout -lphoenix)
 else ifeq ($(platform),macosx)
 	if [ -d out/$(name).app ]; then rm -r out/$(name).app; fi
 	mkdir out/$(name).app

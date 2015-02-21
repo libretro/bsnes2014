@@ -27,9 +27,9 @@ flags += -D__LIBRETRO__
 
 #rules
 objects += libretro
-objects := $(patsubst %,obj/%.o,$(objects))
+objects := $(patsubst %,obj/%-$(profile).o,$(objects))
 
-obj/libretro.o: $(ui)/libretro.cpp $(ui)/*
+obj/libretro-$(profile).o: $(ui)/libretro.cpp $(ui)/*
 
 #targets
 build: $(objects)
