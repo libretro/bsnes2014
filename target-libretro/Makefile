@@ -26,44 +26,46 @@ endif
 flags += -D__LIBRETRO__
 
 #rules
-objects += libretro
 objects := $(patsubst %,obj/%.o,$(objects))
+sfc_objects += libretro
+sfc_objects := $(patsubst %,obj/%-$(profile).o,$(sfc_objects))
+objects += $(sfc_objects)
 
-obj/libretro.o: $(ui)/libretro.cpp $(ui)/*
+obj/libretro-$(profile).o: $(ui)/libretro.cpp $(ui)/*
 
 #targets
 build: $(objects)
 ifeq ($(platform),unix)
-	$(compiler) -o out/bsnes_libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
+	$(compiler) -o out/bsnes_$(profile)_libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
 else ifeq ($(platform),ios)
-	$(compiler) -o out/bsnes_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
+	$(compiler) -o out/bsnes_$(profile)_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
 else ifeq ($(platform),osx)
 ifdef ($(NOUNIVERSAL))
-	$(compiler) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
+	$(compiler) -o out/bsnes_$(profile)_libretro.dylib -dynamiclib $(objects)
 else
-	$(compiler) $(ARCHFLAGS) -o out/bsnes_libretro.dylib -dynamiclib $(objects)
+	$(compiler) $(ARCHFLAGS) -o out/bsnes_$(profile)_libretro.dylib -dynamiclib $(objects)
 endif
 else ifeq ($(platform),win)
-	$(compiler) -o out/bsnes_libretro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T -static-libgcc -static-libstdc++ -lws2_32
+	$(compiler) -o out/bsnes_$(profile)_libretro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T -static-libgcc -static-libstdc++ -lws2_32
 else
 	$(error invalid platform: $(platform). valid platforms are: windows linux macosx ios bsd)
 endif
 
 install:
 ifeq ($(platform),unix)
-	install -D -m 755 out/bsnes_libretro.so $(DESTDIR)$(prefix)/lib/bsnes_libretro.so
+	install -D -m 755 out/bsnes_$(profile)_libretro.so $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.so
 else ifeq ($(platform),osx)
-	cp out/bsnes_libretro.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro.dylib
+	cp out/bsnes_$(profile)_libretro.dylib $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.dylib
 else ifeq ($(platform),ios)
-	cp out/bsnes_libretro_ios.dylib $(DESTDIR)$(prefix)/lib/bsnes_libretro_ios.dylib
+	cp out/bsnes_$(profile)_libretro_ios.dylib $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro_ios.dylib
 endif
 
 uninstall:
 ifeq ($(platform),x)
-	rm $(DESTDIR)$(prefix)/lib/bsnes_libretro.so
+	rm $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.so
 else ifeq ($(platform),osx)
-	rm /usr/local/lib/bsnes_libretro.dylib
+	rm /usr/local/lib/bsnes_$(profile)_libretro.dylib
 else ifeq ($(platform),ios)
-	rm /usr/local/lib/bsnes_libretro_ios.dylib
+	rm /usr/local/lib/bsnes_$(profile)_libretro_ios.dylib
 endif
 
