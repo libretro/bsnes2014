@@ -5,15 +5,15 @@ path := /usr/local/lib
 flags := $(flags) -O3 -fomit-frame-pointer -I..
 
 all:
-	$(compiler) $(cppflags) $(flags) -fPIC -o obj/ananke-$(profile).o -c ananke.cpp
+	$(compiler) $(cppflags) $(flags) -fPIC -o obj/ananke.o -c ananke.cpp
 ifeq ($(platform),windows)
-	$(compiler) $(phoenixflags) -fPIC -o obj/phoenix-$(profile).o -c ../phoenix/phoenix.cpp
-	$(compiler) $(link) -shared -o phoenix.dll obj/phoenix-$(profile).o $(phoenixlink)
-	$(compiler) $(link) -shared -o ananke.dll obj/ananke-$(profile).o -L. -lphoenix
+	$(compiler) $(phoenixflags) -fPIC -o obj/phoenix.o -c ../phoenix/phoenix.cpp
+	$(compiler) $(link) -shared -o phoenix.dll obj/phoenix.o $(phoenixlink)
+	$(compiler) $(link) -shared -o ananke.dll obj/ananke.o -L. -lphoenix
 else ifeq ($(platform),macosx)
-	$(compiler) $(link) -shared -dynamiclib -undefined suppress -flat_namespace -o libananke.dylib obj/ananke-$(profile).o
+	$(compiler) $(link) -shared -dynamiclib -undefined suppress -flat_namespace -o libananke.dylib obj/ananke.o
 else
-	$(compiler) $(link) -shared -Wl,-soname,libananke.so.1 -o libananke.so obj/ananke-$(profile).o
+	$(compiler) $(link) -shared -Wl,-soname,libananke.so.1 -o libananke.so obj/ananke.o
 endif
 
 resource: force

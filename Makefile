@@ -87,7 +87,7 @@ compile = \
 
 all: build;
 
-obj/libco-$(profile).o: libco/libco.c libco/*
+obj/libco.o: libco/libco.c libco/*
 
 include $(ui)/Makefile
 flags := $(flags) $(foreach o,$(call strupper,$(options)),-D$o)

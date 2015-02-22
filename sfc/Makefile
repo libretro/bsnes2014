@@ -9,7 +9,6 @@ sfc_objects += sfc-epsonrtc sfc-sharprtc
 sfc_objects += sfc-spc7110 sfc-sdd1 sfc-obc1
 sfc_objects += sfc-hsu1 sfc-msu1
 sfc_objects += sfc-satellaviewcart sfc-sufamiturbo
-objects += $(sfc_objects)
 
 ifeq ($(profile),accuracy)
   flags += -DPROFILE_ACCURACY

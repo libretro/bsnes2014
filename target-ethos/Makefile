@@ -42,36 +42,39 @@ link += $(rubylink)
 
 # rules
 objects := $(ui_objects) $(objects)
-objects := $(patsubst %,obj/%-$(profile).o,$(objects))
+objects := $(patsubst %,obj/%.o,$(objects))
+# sfc objects have your sfc profile setting in the filename
+sfc_objects := $(patsubst %,obj/%-$(profile).o,$(sfc_objects))
+objects += $(sfc_objects)
 
-obj/ui-ethos-$(profile).o: $(ui)/ethos.cpp $(call rwildcard,$(ui)/)
-obj/ui-configuration-$(profile).o: $(ui)/configuration/configuration.cpp $(call rwildcard,$(ui)/)
-obj/ui-interface-$(profile).o: $(ui)/interface/interface.cpp $(call rwildcard,$(ui)/)
-obj/ui-utility-$(profile).o: $(ui)/utility/utility.cpp $(call rwildcard,$(ui)/)
-obj/ui-input-$(profile).o: $(ui)/input/input.cpp $(call rwildcard,$(ui)/)
-obj/ui-window-$(profile).o: $(ui)/window/window.cpp $(call rwildcard,$(ui)/)
-obj/ui-general-$(profile).o: $(ui)/general/general.cpp $(call rwildcard,$(ui)/)
-obj/ui-settings-$(profile).o: $(ui)/settings/settings.cpp $(call rwildcard,$(ui)/)
-obj/ui-tools-$(profile).o: $(ui)/tools/tools.cpp $(call rwildcard,$(ui)/)
+obj/ui-ethos.o: $(ui)/ethos.cpp $(call rwildcard,$(ui)/)
+obj/ui-configuration.o: $(ui)/configuration/configuration.cpp $(call rwildcard,$(ui)/)
+obj/ui-interface.o: $(ui)/interface/interface.cpp $(call rwildcard,$(ui)/)
+obj/ui-utility.o: $(ui)/utility/utility.cpp $(call rwildcard,$(ui)/)
+obj/ui-input.o: $(ui)/input/input.cpp $(call rwildcard,$(ui)/)
+obj/ui-window.o: $(ui)/window/window.cpp $(call rwildcard,$(ui)/)
+obj/ui-general.o: $(ui)/general/general.cpp $(call rwildcard,$(ui)/)
+obj/ui-settings.o: $(ui)/settings/settings.cpp $(call rwildcard,$(ui)/)
+obj/ui-tools.o: $(ui)/tools/tools.cpp $(call rwildcard,$(ui)/)
 
-obj/ruby-$(profile).o: ruby/ruby.cpp $(call rwildcard,ruby/*)
+obj/ruby.o: ruby/ruby.cpp $(call rwildcard,ruby/*)
 	$(compiler) $(rubyflags) -c $< -o $@
 
-obj/phoenix-$(profile).o: phoenix/phoenix.cpp $(call rwildcard,phoenix/*)
+obj/phoenix.o: phoenix/phoenix.cpp $(call rwildcard,phoenix/*)
 	$(compiler) $(phoenixflags) -c $< -o $@
 
-obj/resource-$(profile).o: $(ui)/resource.rc
+obj/resource.o: $(ui)/resource.rc
 ifeq ($(arch),win32)
-	windres --target=pe-i386 $(ui)/resource.rc obj/resource-$(profile).o
+	windres --target=pe-i386 $(ui)/resource.rc obj/resource.o
 else
-	windres $(ui)/resource.rc obj/resource-$(profile).o
+	windres $(ui)/resource.rc obj/resource.o
 endif
 
 # targets
 build: $(objects)
 ifeq ($(platform),windows)
-	$(strip $(compiler) -shared -o out/phoenix.dll obj/phoenix-$(profile).o $(phoenixlink))
-	$(strip $(compiler) -o out/$(name) $(subst obj/phoenix-$(profile).o,,$(objects)) $(link) -Lout -lphoenix)
+	$(strip $(compiler) -shared -o out/phoenix.dll obj/phoenix.o $(phoenixlink))
+	$(strip $(compiler) -o out/$(name) $(subst obj/phoenix.o,,$(objects)) $(link) -Lout -lphoenix)
 else ifeq ($(platform),macosx)
 	if [ -d out/$(name).app ]; then rm -r out/$(name).app; fi
 	mkdir out/$(name).app
