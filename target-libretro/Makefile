@@ -15,9 +15,9 @@ ifeq ($(IOSSDK),)
    IOSSDK := $(shell xcrun -sdk iphoneos -show-sdk-path)
 endif
 
-  flags += -arch armv7 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
-   OSXVER = `sw_vers -productVersion | cut -d. -f 2`
-   OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
+flags += -arch armv7 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
+OSXVER = `sw_vers -productVersion | cut -d. -f 2`
+OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
 ifeq ($(OSX_LT_MAVERICKS),"YES")
     flags += -miphoneos-version-min=5.0
   endif
