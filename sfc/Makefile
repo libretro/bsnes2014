@@ -11,19 +11,19 @@ sfc_objects += sfc-hsu1 sfc-msu1
 sfc_objects += sfc-satellaviewcart sfc-sufamiturbo
 
 ifeq ($(profile),accuracy)
-  flags += -DPROFILE_ACCURACY
+  profflags := -DPROFILE_ACCURACY
   sfccpu := $(sfc)/cpu
   sfcsmp := $(sfc)/smp
   sfcdsp := $(sfc)/dsp
   sfcppu := $(sfc)/ppu
 else ifeq ($(profile),balanced)
-  flags += -DPROFILE_BALANCED
+  profflags := -DPROFILE_BALANCED
   sfccpu := $(sfc)/cpu
   sfcsmp := $(sfc)/smp
   sfcdsp := $(sfc)/alt/dsp
   sfcppu := $(sfc)/alt/ppu-balanced
 else ifeq ($(profile),performance)
-  flags += -DPROFILE_PERFORMANCE
+  profflags := -DPROFILE_PERFORMANCE
   sfccpu := $(sfc)/alt/cpu
   sfcsmp := $(sfc)/alt/smp
   sfcdsp := $(sfc)/alt/dsp
