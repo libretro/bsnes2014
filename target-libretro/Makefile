@@ -12,7 +12,7 @@ else ifeq ($(platform),osx)
 else ifeq ($(platform),ios)
 
 ifeq ($(IOSSDK),)
-   IOSSDK := $(shell xcrun -sdk iphoneos -show-sdk-path)
+   IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 endif
 
 flags += -arch armv7 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
