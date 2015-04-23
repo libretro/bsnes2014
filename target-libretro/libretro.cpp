@@ -159,6 +159,7 @@ struct Callbacks : Emulator::Interface::Bind {
       pvideo_refresh(video_buffer_16, width, height, width*sizeof(uint16_t));
       pinput_poll();
     }
+  }
 
   void audioSample(int16_t left, int16_t right)
   {
