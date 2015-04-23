@@ -610,8 +610,8 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
       //this one is always supported
       core_bind.video_fmt = Callbacks::video_fmt_15;
     }
+    SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Standard);
   }
-  SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Standard);
 }
 
 static bool snes_load_cartridge_normal(
