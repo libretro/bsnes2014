@@ -119,7 +119,15 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  uint32_t video_buffer[512 * 480];
+  enum {
+    video_fmt_32,
+    video_fmt_16,
+    video_fmt_15
+  } video_fmt;
+  union {
+    uint32_t video_buffer[512 * 480];
+    uint16_t video_buffer_16[512 * 480];
+  };
 
   void videoRefresh(const uint32_t *palette, const uint32_t *data, unsigned pitch, unsigned width, unsigned height) {
     if (!overscan) {
@@ -131,14 +139,26 @@ struct Callbacks : Emulator::Interface::Bind {
         height = 448;
     }
 
-    uint32_t *ptr = video_buffer;
-    for (unsigned y = 0; y < height; y++, data += pitch >> 2, ptr += width)
-       for (unsigned x = 0; x < width; x++)
-          ptr[x] = palette[data[x]];
-
-    pvideo_refresh(video_buffer, width, height, width << 2);
-    pinput_poll();
-  }
+    if (video_fmt == video_fmt_32)
+    {
+      uint32_t *ptr = video_buffer;
+      for (unsigned y = 0; y < height; y++, data += pitch >> 2, ptr += width)
+         for (unsigned x = 0; x < width; x++)
+            ptr[x] = palette[data[x]];
+      
+      pvideo_refresh(video_buffer, width, height, width*sizeof(uint32_t));
+      pinput_poll();
+    }
+    else
+    {
+      uint16_t *ptr = video_buffer_16;
+      for (unsigned y = 0; y < height; y++, data += pitch >> 2, ptr += width)
+         for (unsigned x = 0; x < width; x++)
+            ptr[x] = palette[data[x]];
+      
+      pvideo_refresh(video_buffer_16, width, height, width*sizeof(uint16_t));
+      pinput_poll();
+    }
 
   void audioSample(int16_t left, int16_t right)
   {
@@ -332,7 +352,9 @@ struct Callbacks : Emulator::Interface::Bind {
     r >>= 8;
     g >>= 8;
     b >>= 8;
-    return (r << 16) | (g << 8) | (b << 0);
+    if (video_fmt == video_fmt_32) return (r << 16) | (g << 8) | (b << 0);
+    if (video_fmt == video_fmt_16) return (r>>3 << 11) | (g>>2 << 5) | (b>>3 << 0);
+    if (video_fmt == video_fmt_15) return (r>>3 << 10) | (g>>3 << 5) | (b>>3 << 0);
   }
 };
 
@@ -574,8 +596,22 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
   info->timing   = timing;
   info->geometry = geom;
 
-  enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
-  core_bind.penviron(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt);
+  enum retro_pixel_format fmt;
+  fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+  if (core_bind.penviron(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+    core_bind.video_fmt = Callbacks::video_fmt_32;
+  else
+  {
+    fmt = RETRO_PIXEL_FORMAT_RGB565;
+    if (core_bind.penviron(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+      core_bind.video_fmt = Callbacks::video_fmt_16;
+    else
+    {
+      //this one is always supported
+      core_bind.video_fmt = Callbacks::video_fmt_15;
+    }
+  }
+  SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Standard);
 }
 
 static bool snes_load_cartridge_normal(
