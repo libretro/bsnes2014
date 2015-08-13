@@ -45,7 +45,7 @@ ifdef ($(NOUNIVERSAL))
 else
 	$(compiler) $(ARCHFLAGS) -o out/bsnes_$(profile)_libretro.dylib -dynamiclib $(objects)
 endif
-else ifeq ($(platform),win)
+else ifeq ($(platform),windows)
 	$(compiler) -o out/bsnes_$(profile)_libretro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T -static-libgcc -static-libstdc++ -lws2_32
 else
 	$(error invalid platform: $(platform). valid platforms are: windows linux macosx ios bsd)
