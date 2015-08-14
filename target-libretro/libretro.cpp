@@ -66,7 +66,7 @@ const uint8 iplrom[64] = {
 
 struct Callbacks : Emulator::Interface::Bind {
   retro_video_refresh_t pvideo_refresh;
-  retro_audio_sample_batch_t paudio_sample;
+  retro_audio_sample_batch_t paudio;
   retro_input_poll_t pinput_poll;
   retro_input_state_t pinput_state;
   retro_environment_t penviron;
@@ -161,10 +161,17 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
+  int16_t sampleBuf[128];
+  unsigned int sampleBufPos;
+
   void audioSample(int16_t left, int16_t right)
   {
-     const int16_t samples[2] = { left, right };
-     paudio_sample(samples, 1);
+    sampleBuf[sampleBufPos++] = left;
+    sampleBuf[sampleBufPos++] = right;
+    if(sampleBufPos==128) {
+      paudio(sampleBuf, 64);
+      sampleBufPos = 0;
+    }
   }
 
   int16_t inputPoll(unsigned port, unsigned device, unsigned id) {
@@ -500,7 +507,7 @@ void retro_set_environment(retro_environment_t environ_cb)
 
 void retro_set_video_refresh(retro_video_refresh_t video_refresh) { core_bind.pvideo_refresh = video_refresh; }
 void retro_set_audio_sample(retro_audio_sample_t)    { }
-void retro_set_audio_sample_batch(retro_audio_sample_batch_t audio_sample) { core_bind.paudio_sample  = audio_sample; }
+void retro_set_audio_sample_batch(retro_audio_sample_batch_t audio_sample) { core_bind.paudio  = audio_sample; }
 void retro_set_input_poll(retro_input_poll_t input_poll)          { core_bind.pinput_poll    = input_poll; }
 void retro_set_input_state(retro_input_state_t input_state)       { core_bind.pinput_state   = input_state; }
 
@@ -515,6 +522,8 @@ void retro_init(void) {
 
   core_interface.init();
   core_gb_interface.init();
+
+  core_bind.sampleBufPos = 0;
 
   SuperFamicom::system.init();
   SuperFamicom::input.connect(SuperFamicom::Controller::Port1, SuperFamicom::Input::Device::Joypad);
@@ -531,6 +540,10 @@ void retro_reset(void) {
 
 void retro_run(void) {
   SuperFamicom::system.run();
+  if(core_bind.sampleBufPos) {
+    core_bind.paudio(core_bind.sampleBuf, core_bind.sampleBufPos/2);
+    core_bind.sampleBufPos = 0;
+  }
 }
 
 size_t retro_serialize_size(void) {
