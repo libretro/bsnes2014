@@ -668,11 +668,11 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
   }
 }
 
-static void output_multiline(enum retro_log_level level, char * data)
+static void output_multiline(enum retro_log_level level, const char * data)
 {
   while (true)
   {
-    char* data_linebreak=strchr(data, '\n');
+    char* data_linebreak=(char*)strchr(data, '\n');
     if (data_linebreak) *data_linebreak='\0';
     if (*data) output(level, "%s\n", data);
     if (!data_linebreak) break;
