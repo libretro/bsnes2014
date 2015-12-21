@@ -69,6 +69,17 @@ const char sysmanifest[]=
 "  smp\n"
 "    rom name=ipl.rom size=64\n";
 
+static void retro_log_default(enum retro_log_level level, const char *fmt, ...)
+{
+  fprintf(stderr, "[bsnes]: ");
+  va_list args;
+  va_start(args, fmt);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+}
+static retro_log_printf_t output;
+
+static const char * read_opt(const char * name, const char * defval);
 
 struct Callbacks : Emulator::Interface::Bind {
   retro_video_refresh_t pvideo_refresh;
@@ -187,7 +198,7 @@ struct Callbacks : Emulator::Interface::Bind {
 
   void saveRequest(unsigned id, string p) override {
     if (manifest) {
-      fprintf(stderr, "[bsnes]: [Save]: ID %u, Request \"%s\".\n", id, (const char*)p);
+      output(RETRO_LOG_INFO, "[Save]: ID %u, Request \"%s\".\n", id, (const char*)p);
       string save_path = {path(0), p};
       filestream stream(save_path, file::mode::write);
       iface->save(id, stream);
@@ -209,11 +220,11 @@ struct Callbacks : Emulator::Interface::Bind {
         mmapstream stream(load_path);
         iface->load(id, stream);
       } else {
-        fprintf(stderr, "[bsnes]: Cannot find requested file in system directory: \"%s\".\n", (const char*)load_path);
+        output(RETRO_LOG_ERROR, "Cannot find requested file in system directory: \"%s\".\n", (const char*)load_path);
         load_request_error = true;
       }
     } else {
-      fprintf(stderr, "[bsnes]: Cannot find requested file: \"%s\" in ROM directory nor system directory.\n", (const char*)p);
+      fprintf(stderr, "Cannot find requested file: \"%s\" in ROM directory nor system directory.\n", (const char*)p);
       load_request_error = true;
     }
   }
@@ -249,7 +260,7 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   inline void loadRequestManifest(unsigned id, const string& p) {
-    fprintf(stderr, "[bsnes]: [Manifest]: ID %u, Request \"%s\".\n", id, (const char*)p);
+    output(RETRO_LOG_INFO, "[Manifest]: ID %u, Request \"%s\".\n", id, (const char*)p);
     switch(id) {
       case SuperFamicom::ID::IPLROM:
         loadIPLROM(id);
@@ -270,7 +281,7 @@ struct Callbacks : Emulator::Interface::Bind {
   }
 
   inline void loadRequestMemory(unsigned id, const string& p) {
-    fprintf(stderr, "[bsnes]: [Memory]: ID %u, Request \"%s\".\n", id, (const char*)p);
+    output(RETRO_LOG_INFO, "[Memory]: ID %u, Request \"%s\".\n", id, (const char*)p);
     switch(id) {
       case SuperFamicom::ID::Manifest:
         loadManifest(id);
@@ -290,7 +301,7 @@ struct Callbacks : Emulator::Interface::Bind {
       case SuperFamicom::ID::SDD1ROM:
       case SuperFamicom::ID::HitachiDSPROM:
       case SuperFamicom::ID::SPC7110PROM:
-        fprintf(stderr, "[bsnes]: Load ROM.\n");
+        output(RETRO_LOG_INFO, "Load ROM.\n");
         loadROM(id);
         break;
 
@@ -345,7 +356,7 @@ struct Callbacks : Emulator::Interface::Bind {
         break;
 
       default:
-        fprintf(stderr, "[bsnes]: Load BIOS.\n");
+        output(RETRO_LOG_INFO, "Load BIOS.\n");
         loadFile(id, p);
         break;
     }
@@ -356,18 +367,18 @@ struct Callbacks : Emulator::Interface::Bind {
        loadRequestManifest(id, p);
     else
        loadRequestMemory(id, p);
-    fprintf(stderr, "[bsnes]: Complete load request.\n");
+    output(RETRO_LOG_INFO, "Complete load request.\n");
   }
 
   void loadRequest(unsigned id, string p, string manifest, bool required) override {
     switch (id) {
       case SuperFamicom::ID::GameBoy:
-        fprintf(stderr, "[bsnes]: Loading GB ROM.\n");
+        output(RETRO_LOG_INFO, "Loading GB ROM.\n");
         loadSGBROMManifest(id);
         break;
 
       default:
-        fprintf(stderr, "[bsnes]: Didn't do anything with loadRequest (3 arg).\n");
+        output(RETRO_LOG_WARN, "Didn't do anything with loadRequest (3 arg).\n");
     }
   }
 
@@ -588,6 +599,7 @@ bool retro_unserialize(const void *data, size_t size) {
   return SuperFamicom::system.unserialize(s);
 }
 
+#if 0
 struct CheatList {
   bool enable;
   string code;
@@ -595,13 +607,17 @@ struct CheatList {
 };
 
 static vector<CheatList> cheatList;
+#endif
 
 void retro_cheat_reset(void) {
+#if 0
   cheatList.reset();
   core_interface.setCheats();
+#endif
 }
 
 void retro_cheat_set(unsigned index, bool enable, const char *code) {
+#if 0
   cheatList[index].enable = enable;
   cheatList[index].code = code;
   lstring list;
@@ -611,6 +627,7 @@ void retro_cheat_set(unsigned index, bool enable, const char *code) {
   }
 
   core_interface.setCheats(list);
+#endif
 }
 
 void retro_get_system_info(struct retro_system_info *info) {
@@ -653,6 +670,19 @@ void retro_get_system_av_info(struct retro_system_av_info *info) {
   }
 }
 
+static void output_multiline(enum retro_log_level level, char * data)
+{
+  while (true)
+  {
+    char* data_linebreak=strchr(data, '\n');
+    if (data_linebreak) *data_linebreak='\0';
+    if (*data) output(level, "%s\n", data);
+    if (!data_linebreak) break;
+    *data_linebreak='\n';
+    data=data_linebreak+1;
+  }
+}
+
 static bool snes_load_cartridge_normal(
   const char *rom_xml, const uint8_t *rom_data, unsigned rom_size
 ) {
@@ -661,7 +691,8 @@ static bool snes_load_cartridge_normal(
   core_bind.rom_data = rom_data;
   core_bind.rom_size = rom_size;
   core_bind.xmlrom   = xmlrom;
-  fprintf(stderr, "[bsnes]: XML map:\n%s\n", (const char*)xmlrom);
+  output(RETRO_LOG_INFO, "BML map:\n");
+  output_multiline(RETRO_LOG_INFO, xmlrom.data());
   core_bind.iface->load(SuperFamicom::ID::SuperFamicom);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
@@ -727,8 +758,10 @@ static bool snes_load_cartridge_super_game_boy(
 ) {
   string xmlrom_sgb = (rom_xml && *rom_xml) ? string(rom_xml) : SuperFamicomCartridge(rom_data, rom_size).markup;
   string xmlrom_gb  = (dmg_xml && *dmg_xml) ? string(dmg_xml) : GameBoyCartridge((uint8_t*)dmg_data, dmg_size).markup;
-  fprintf(stderr, "[bsnes]: Markup SGB: %s\n", (const char*)xmlrom_sgb);
-  fprintf(stderr, "[bsnes]: Markup GB: %s\n", (const char*)xmlrom_gb);
+  output(RETRO_LOG_INFO, "Markup SGB:\n");
+  output_multiline(RETRO_LOG_INFO, xmlrom_sgb.data());
+  output(RETRO_LOG_INFO, "Markup GB:\n");
+  output_multiline(RETRO_LOG_INFO, xmlrom_gb.data());
 
   core_bind.rom_data    = rom_data;
   core_bind.rom_size    = rom_size;
@@ -936,7 +969,7 @@ void retro_unload_game(void) {
 }
 
 unsigned retro_get_region(void) {
-  return SuperFamicom::system.region() == SuperFamicom::System::Region::NTSC ? 0 : 1;
+  return SuperFamicom::system.region() == SuperFamicom::System::Region::NTSC ? RETRO_REGION_NTSC : RETRO_REGION_PAL;
 }
 
 void* retro_get_memory_data(unsigned id) {
@@ -980,7 +1013,7 @@ size_t retro_get_memory_size(unsigned id) {
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
       size = core_bind.sram_size;
-      fprintf(stderr, "[bsnes]: SRAM memory size: %u.\n", (unsigned)size);
+      output(RETRO_LOG_INFO, "SRAM memory size: %u.\n", (unsigned)size);
       break;
     case RETRO_MEMORY_RTC:
       size = 0;
