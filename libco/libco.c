@@ -1,30 +1,21 @@
 /*
   libco
+  auto-selection module
   license: public domain
 */
 
-#if defined(__clang__) || defined(__GNUC__)
-  #if defined(__i386__)
-    #include "x86.c"
-  #elif defined(__amd64__)
-    #include "amd64.c"
-  #elif defined(__arm__)
-    #include "arm.c"
-  #elif defined(_ARCH_PPC)
-    #include "ppc.c"
-  #elif defined(_WIN32)
-    #include "fiber.c"
-  #else
-    #include "sjlj.c"
-  #endif
+#if defined(__GNUC__) && defined(__i386__) || (defined(_MSC_VER) && defined(_M_IX86))
+  #include "x86.c"
+#elif defined(__GNUC__) && defined(__amd64__) || (defined(_MSC_VER) && defined(_M_AMD64))
+  #include "amd64.c"
+#elif defined(__GNUC__) && defined(_ARCH_PPC)
+  #include "ppc.c"
+#elif defined(__GNUC__) && (defined(__ARM_EABI__) || defined(__arm__))
+  #include "armeabi.c"
+#elif defined(__GNUC__)
+  #include "sjlj.c"
 #elif defined(_MSC_VER)
-  #if defined(_M_IX86)
-    #include "x86.c"
-  #elif defined(_M_AMD64)
-    #include "amd64.c"
-  #else
-    #include "fiber.c"
-  #endif
+  #include "fiber.c"
 #else
   #error "libco: unsupported processor, compiler or operating system"
 #endif
