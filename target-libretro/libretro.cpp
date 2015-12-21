@@ -2,8 +2,8 @@
 #include <sfc/sfc.hpp>
 #include <nall/stream/mmap.hpp>
 #include <nall/stream/file.hpp>
-#include "../ananke/heuristics/super-famicom.hpp"
-#include "../ananke/heuristics/game-boy.hpp"
+#include "../icarus/heuristics/super-famicom.hpp"
+#include "../icarus/heuristics/game-boy.hpp"
 #include <string>
 
 // Special memory types.
@@ -64,6 +64,12 @@ const uint8 iplrom[64] = {
 /*fffe*/  0xc0, 0xff         //reset vector location ($ffc0)
 };
 
+const char sysmanifest[]=
+"system name:Super Famicom\n"
+"  smp\n"
+"    rom name=ipl.rom size=64\n";
+
+
 struct Callbacks : Emulator::Interface::Bind {
   retro_video_refresh_t pvideo_refresh;
   retro_audio_sample_batch_t paudio;
@@ -88,15 +94,15 @@ struct Callbacks : Emulator::Interface::Bind {
   string basename;
 
   static unsigned snes_to_retro(unsigned device) {
-    switch ((SuperFamicom::Input::Device)device) {
+    switch ((SuperFamicom::Device::ID)device) {
        default:
-       case SuperFamicom::Input::Device::None:       return RETRO_DEVICE_NONE;
-       case SuperFamicom::Input::Device::Joypad:     return RETRO_DEVICE_JOYPAD;
-       case SuperFamicom::Input::Device::Multitap:   return RETRO_DEVICE_JOYPAD_MULTITAP;
-       case SuperFamicom::Input::Device::Mouse:      return RETRO_DEVICE_MOUSE;
-       case SuperFamicom::Input::Device::SuperScope: return RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE;
-       case SuperFamicom::Input::Device::Justifier:  return RETRO_DEVICE_LIGHTGUN_JUSTIFIER;
-       case SuperFamicom::Input::Device::Justifiers: return RETRO_DEVICE_LIGHTGUN_JUSTIFIERS;
+       case SuperFamicom::Device::ID::None:       return RETRO_DEVICE_NONE;
+       case SuperFamicom::Device::ID::Gamepad:    return RETRO_DEVICE_JOYPAD;
+       case SuperFamicom::Device::ID::Multitap:   return RETRO_DEVICE_JOYPAD_MULTITAP;
+       case SuperFamicom::Device::ID::Mouse:      return RETRO_DEVICE_MOUSE;
+       case SuperFamicom::Device::ID::SuperScope: return RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE;
+       case SuperFamicom::Device::ID::Justifier:  return RETRO_DEVICE_LIGHTGUN_JUSTIFIER;
+       case SuperFamicom::Device::ID::Justifiers: return RETRO_DEVICE_LIGHTGUN_JUSTIFIERS;
     }
   }
 
@@ -105,17 +111,17 @@ struct Callbacks : Emulator::Interface::Bind {
     return id;
   }
 
-  static SuperFamicom::Input::Device retro_to_snes(unsigned device) {
+  static SuperFamicom::Device::ID retro_to_snes(unsigned device) {
     switch (device) {
        default:
-       case RETRO_DEVICE_NONE:                 return SuperFamicom::Input::Device::None;
-       case RETRO_DEVICE_JOYPAD:               return SuperFamicom::Input::Device::Joypad;
-       case RETRO_DEVICE_ANALOG:               return SuperFamicom::Input::Device::Joypad;
-       case RETRO_DEVICE_JOYPAD_MULTITAP:      return SuperFamicom::Input::Device::Multitap;
-       case RETRO_DEVICE_MOUSE:                return SuperFamicom::Input::Device::Mouse;
-       case RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE: return SuperFamicom::Input::Device::SuperScope;
-       case RETRO_DEVICE_LIGHTGUN_JUSTIFIER:   return SuperFamicom::Input::Device::Justifier;
-       case RETRO_DEVICE_LIGHTGUN_JUSTIFIERS:  return SuperFamicom::Input::Device::Justifiers;
+       case RETRO_DEVICE_NONE:                 return SuperFamicom::Device::ID::None;
+       case RETRO_DEVICE_JOYPAD:               return SuperFamicom::Device::ID::Gamepad;
+       case RETRO_DEVICE_ANALOG:               return SuperFamicom::Device::ID::Gamepad;
+       case RETRO_DEVICE_JOYPAD_MULTITAP:      return SuperFamicom::Device::ID::Multitap;
+       case RETRO_DEVICE_MOUSE:                return SuperFamicom::Device::ID::Mouse;
+       case RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE: return SuperFamicom::Device::ID::SuperScope;
+       case RETRO_DEVICE_LIGHTGUN_JUSTIFIER:   return SuperFamicom::Device::ID::Justifier;
+       case RETRO_DEVICE_LIGHTGUN_JUSTIFIERS:  return SuperFamicom::Device::ID::Justifiers;
     }
   }
 
@@ -129,7 +135,7 @@ struct Callbacks : Emulator::Interface::Bind {
     uint16_t video_buffer_16[512 * 480];
   };
 
-  void videoRefresh(const uint32_t *palette, const uint32_t *data, unsigned pitch, unsigned width, unsigned height) {
+  void videoRefresh(const uint32_t *palette, const uint32_t *data, unsigned pitch, unsigned width, unsigned height) override {
     if (!overscan) {
       data += 8 * 1024;
 
@@ -164,7 +170,7 @@ struct Callbacks : Emulator::Interface::Bind {
   int16_t sampleBuf[128];
   unsigned int sampleBufPos;
 
-  void audioSample(int16_t left, int16_t right)
+  void audioSample(int16_t left, int16_t right) override
   {
     sampleBuf[sampleBufPos++] = left;
     sampleBuf[sampleBufPos++] = right;
@@ -174,12 +180,12 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  int16_t inputPoll(unsigned port, unsigned device, unsigned id) {
+  int16_t inputPoll(unsigned port, unsigned device, unsigned id) override {
     if(id > 11) return 0;
     return pinput_state(port, snes_to_retro(device), 0, snes_to_retro(device, id));
   }
 
-  void saveRequest(unsigned id, string p) {
+  void saveRequest(unsigned id, string p) override {
     if (manifest) {
       fprintf(stderr, "[bsnes]: [Save]: ID %u, Request \"%s\".\n", id, (const char*)p);
       string save_path = {path(0), p};
@@ -188,7 +194,7 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  void loadFile(unsigned id, string p) {
+  inline void loadFile(unsigned id, string p) {
     // Look for BIOS in system directory as well.
     const char *dir = 0;
     penviron(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir);
@@ -212,32 +218,37 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  void loadROM(unsigned id) {
+  inline void loadROM(unsigned id) {
     memorystream stream(rom_data, rom_size);
     iface->load(id, stream);
   }
 
-  void loadManifest(unsigned id) {
+  inline void loadManifest(unsigned id) {
     memorystream stream((const uint8_t*)(const char*)xmlrom, xmlrom.length());
     iface->load(id, stream);
   }
 
-  void loadSGBROMManifest(unsigned id) {
-    memorystream stream((const uint8_t*)(const char*)xmlrom_gb, xmlrom_gb.length());
-    iface->load(SuperFamicom::ID::SuperGameBoyManifest, stream);
+  inline void loadSysManifest(unsigned id) {
+    memorystream stream((const uint8_t*)sysmanifest, sizeof(sysmanifest)-1);
+    iface->load(id, stream);
   }
 
-  void loadSGBROM(unsigned id) {
+  inline void loadSGBROMManifest(unsigned id) {
+    memorystream stream((const uint8_t*)(const char*)xmlrom_gb, xmlrom_gb.length());
+    iface->load(SuperFamicom::ID::GameBoyManifest, stream);
+  }
+
+  inline void loadSGBROM(unsigned id) {
     memorystream stream(gb_rom_data, gb_rom_size);
     iface->load(id, stream);
   }
 
-  void loadIPLROM(unsigned id) {
+  inline void loadIPLROM(unsigned id) {
     memorystream stream(iplrom, sizeof(iplrom));
     iface->load(id, stream);
   }
 
-  void loadRequestManifest(unsigned id, const string& p) {
+  inline void loadRequestManifest(unsigned id, const string& p) {
     fprintf(stderr, "[bsnes]: [Manifest]: ID %u, Request \"%s\".\n", id, (const char*)p);
     switch(id) {
       case SuperFamicom::ID::IPLROM:
@@ -248,20 +259,28 @@ struct Callbacks : Emulator::Interface::Bind {
         loadManifest(id);
         break;
 
+      case SuperFamicom::ID::SystemManifest:
+        loadSysManifest(id);
+        break;
+
       default:
         loadFile(id, p);
         break;
     }
   }
 
-  void loadRequestMemory(unsigned id, const string& p) {
+  inline void loadRequestMemory(unsigned id, const string& p) {
     fprintf(stderr, "[bsnes]: [Memory]: ID %u, Request \"%s\".\n", id, (const char*)p);
     switch(id) {
       case SuperFamicom::ID::Manifest:
         loadManifest(id);
         break;
 
-      case SuperFamicom::ID::SuperGameBoyManifest:
+      case SuperFamicom::ID::SystemManifest:
+        loadSysManifest(id);
+        break;
+
+      case SuperFamicom::ID::GameBoyManifest:
         loadSGBROMManifest(id);
         break;
 
@@ -275,7 +294,7 @@ struct Callbacks : Emulator::Interface::Bind {
         loadROM(id);
         break;
 
-      case SuperFamicom::ID::SuperGameBoyROM:
+      case SuperFamicom::ID::GameBoyROM:
         loadSGBROM(id);
         break;
 
@@ -318,7 +337,7 @@ struct Callbacks : Emulator::Interface::Bind {
         break;
 
       // SGB RAM is handled explicitly.
-      case SuperFamicom::ID::SuperGameBoyRAM:
+      case SuperFamicom::ID::GameBoyRAM:
         break;
 
       case SuperFamicom::ID::IPLROM:
@@ -332,7 +351,7 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  void loadRequest(unsigned id, string p) {
+  void loadRequest(unsigned id, string p, bool required) override {
     if (manifest)
        loadRequestManifest(id, p);
     else
@@ -340,9 +359,9 @@ struct Callbacks : Emulator::Interface::Bind {
     fprintf(stderr, "[bsnes]: Complete load request.\n");
   }
 
-  void loadRequest(unsigned id, string p, string manifest) {
+  void loadRequest(unsigned id, string p, string manifest, bool required) override {
     switch (id) {
-      case SuperFamicom::ID::SuperGameBoy:
+      case SuperFamicom::ID::GameBoy:
         fprintf(stderr, "[bsnes]: Loading GB ROM.\n");
         loadSGBROMManifest(id);
         break;
@@ -352,11 +371,11 @@ struct Callbacks : Emulator::Interface::Bind {
     }
   }
 
-  string path(unsigned) {
+  string path(unsigned) override {
     return string(basename);
   }
 
-  uint32_t videoColor(unsigned, uint16_t, uint16_t r, uint16_t g, uint16_t b) {
+  uint32_t videoColor(unsigned, uint16_t, uint16_t r, uint16_t g, uint16_t b) override {
     r >>= 8;
     g >>= 8;
     b >>= 8;
@@ -368,36 +387,42 @@ struct Callbacks : Emulator::Interface::Bind {
 
 static Callbacks core_bind;
 
-struct Interface : public SuperFamicom::Interface {
-  SuperFamicomCartridge::Mode mode;
+struct LibretroInterface : public SuperFamicom::Interface {
+  enum Mode {
+    ModeNormal,
+    ModeBsxSlotted,
+    ModeBsx,
+    ModeSufamiTurbo,
+    ModeSuperGameBoy,
+  } mode;
 
   void setCheats(const lstring &list = lstring());
 
-  Interface();
+  LibretroInterface();
 
-  void init() {
+  inline void init() {
      SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Standard);
   }
 };
 
 struct GBInterface : public GameBoy::Interface {
   GBInterface() { bind = &core_bind; }
-  void init() {
+  inline void init() {
      SuperFamicom::video.generate_palette(Emulator::Interface::PaletteMode::Standard);
   }
 };
 
-static Interface core_interface;
+static LibretroInterface core_interface;
 static GBInterface core_gb_interface;
 
-Interface::Interface() {
+LibretroInterface::LibretroInterface() {
   bind = &core_bind;
   core_bind.iface = &core_interface;
 }
 
-void Interface::setCheats(const lstring &) {
+void LibretroInterface::setCheats(const lstring &) {
 #if 0
-  if(core_interface.mode == SuperFamicomCartridge::ModeSuperGameBoy) {
+  if(core_interface.mode == LibretroInterface::ModeSuperGameBoy) {
     GameBoy::cheat.reset();
     for(auto &code : list) {
       lstring codelist;
@@ -513,7 +538,7 @@ void retro_set_input_state(retro_input_state_t input_state)       { core_bind.pi
 
 void retro_set_controller_port_device(unsigned port, unsigned device) {
   if (port < 2)
-    SuperFamicom::input.connect(port, Callbacks::retro_to_snes(device));
+    SuperFamicom::device.connect(port, Callbacks::retro_to_snes(device));
 }
 
 void retro_init(void) {
@@ -526,8 +551,8 @@ void retro_init(void) {
   core_bind.sampleBufPos = 0;
 
   SuperFamicom::system.init();
-  SuperFamicom::input.connect(SuperFamicom::Controller::Port1, SuperFamicom::Input::Device::Joypad);
-  SuperFamicom::input.connect(SuperFamicom::Controller::Port2, SuperFamicom::Input::Device::Joypad);
+  SuperFamicom::device.connect(SuperFamicom::Controller::Port1, SuperFamicom::Device::ID::Gamepad);
+  SuperFamicom::device.connect(SuperFamicom::Controller::Port2, SuperFamicom::Device::ID::Gamepad);
 }
 
 void retro_deinit(void) {
@@ -547,11 +572,11 @@ void retro_run(void) {
 }
 
 size_t retro_serialize_size(void) {
-  return SuperFamicom::system.serialize_size();
+  return SuperFamicom::system.serializeSize();
 }
 
 bool retro_serialize(void *data, size_t size) {
-  SuperFamicom::system.runtosave();
+  SuperFamicom::system.runToSave();
   serializer s = SuperFamicom::system.serialize();
   if(s.size() > size) return false;
   memcpy(data, s.data(), s.size());
@@ -713,7 +738,7 @@ static bool snes_load_cartridge_super_game_boy(
   core_bind.xmlrom_gb   = xmlrom_gb;
 
   core_bind.iface->load(SuperFamicom::ID::SuperFamicom);
-  core_bind.iface->load(SuperFamicom::ID::SuperGameBoy);
+  core_bind.iface->load(SuperFamicom::ID::GameBoy);
   SuperFamicom::system.power();
   return !core_bind.load_request_error;
 }
@@ -820,7 +845,7 @@ bool retro_load_game(const struct retro_game_info *info) {
       core_bind.basename = "./";
   }
 
-  core_interface.mode = SuperFamicomCartridge::ModeNormal;
+  core_interface.mode = LibretroInterface::ModeNormal;
   std::string manifest;
   if (core_bind.manifest)
     manifest = std::string((const char*)info->data, info->size); // Might not be 0 terminated.
@@ -857,43 +882,43 @@ bool retro_load_game_special(unsigned game_type,
 
   switch (game_type) {
      case RETRO_GAME_TYPE_BSX:
-        core_interface.mode = SuperFamicomCartridge::ModeBsx;
+        core_interface.mode = LibretroInterface::ModeBsx;
         return num_info == 2 && snes_load_cartridge_bsx(info[0].meta, data, size,
               info[1].meta, (const uint8_t*)info[1].data, info[1].size);
 
      case RETRO_GAME_TYPE_BSX | 0x1000:
-        core_interface.mode = SuperFamicomCartridge::ModeBsx;
+        core_interface.mode = LibretroInterface::ModeBsx;
         return num_info == 2 && snes_load_cartridge_bsx(info[1].meta, (const uint8_t*)info[1].data, info[1].size,
               info[0].meta, (const uint8_t*)info[0].data, info[0].size);
 
      case RETRO_GAME_TYPE_BSX_SLOTTED:
-        core_interface.mode = SuperFamicomCartridge::ModeBsxSlotted;
+        core_interface.mode = LibretroInterface::ModeBsxSlotted;
         return num_info == 2 && snes_load_cartridge_bsx_slotted(info[0].meta, data, size,
               info[1].meta, (const uint8_t*)info[1].data, info[1].size);
 
      case RETRO_GAME_TYPE_BSX_SLOTTED | 0x1000:
-        core_interface.mode = SuperFamicomCartridge::ModeBsxSlotted;
+        core_interface.mode = LibretroInterface::ModeBsxSlotted;
         return num_info == 2 && snes_load_cartridge_bsx(info[1].meta, (const uint8_t*)info[1].data, info[1].size,
               info[0].meta, (const uint8_t*)info[0].data, info[0].size);
 
      case RETRO_GAME_TYPE_SUPER_GAME_BOY:
-        core_interface.mode = SuperFamicomCartridge::ModeSuperGameBoy;
+        core_interface.mode = LibretroInterface::ModeSuperGameBoy;
         return num_info == 2 && snes_load_cartridge_super_game_boy(info[0].meta, data, size,
               info[1].meta, (const uint8_t*)info[1].data, info[1].size);
 
      case RETRO_GAME_TYPE_SUPER_GAME_BOY | 0x1000:
-        core_interface.mode = SuperFamicomCartridge::ModeSuperGameBoy;
+        core_interface.mode = LibretroInterface::ModeSuperGameBoy;
         return num_info == 2 && snes_load_cartridge_super_game_boy(info[1].meta, (const uint8_t*)info[1].data, info[1].size,
               info[0].meta, (const uint8_t*)info[0].data, info[0].size);
 
      case RETRO_GAME_TYPE_SUFAMI_TURBO:
-        core_interface.mode = SuperFamicomCartridge::ModeSufamiTurbo;
+        core_interface.mode = LibretroInterface::ModeSufamiTurbo;
         return num_info == 3 && snes_load_cartridge_sufami_turbo(info[0].meta, (const uint8_t*)info[0].data, info[0].size,
               info[1].meta, (const uint8_t*)info[1].data, info[1].size,
               info[2].meta, (const uint8_t*)info[2].data, info[2].size);
 
      case RETRO_GAME_TYPE_SUFAMI_TURBO | 0x1000:
-        core_interface.mode = SuperFamicomCartridge::ModeSufamiTurbo;
+        core_interface.mode = LibretroInterface::ModeSufamiTurbo;
         return num_info == 3 && snes_load_cartridge_sufami_turbo(info[2].meta, (const uint8_t*)info[2].data, info[2].size,
               info[0].meta, (const uint8_t*)info[0].data, info[0].size,
               info[1].meta, (const uint8_t*)info[1].data, info[1].size);
@@ -926,16 +951,16 @@ void* retro_get_memory_data(unsigned id) {
     case RETRO_MEMORY_SNES_BSX_RAM:
       return nullptr;
     case RETRO_MEMORY_SNES_BSX_PRAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeBsx) break;
-      return SuperFamicom::bsxcartridge.psram.data();
+      if(core_interface.mode != LibretroInterface::ModeBsx) break;
+      return SuperFamicom::bsmemory.memory.data();
     case RETRO_MEMORY_SNES_SUFAMI_TURBO_A_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeSufamiTurbo) break;
+      if(core_interface.mode != LibretroInterface::ModeSufamiTurbo) break;
       return SuperFamicom::sufamiturboA.ram.data();
     case RETRO_MEMORY_SNES_SUFAMI_TURBO_B_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeSufamiTurbo) break;
+      if(core_interface.mode != LibretroInterface::ModeSufamiTurbo) break;
       return SuperFamicom::sufamiturboB.ram.data();
     case RETRO_MEMORY_SNES_GAME_BOY_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeSuperGameBoy) break;
+      if(core_interface.mode != LibretroInterface::ModeSuperGameBoy) break;
       return GameBoy::cartridge.ramdata;
 
     case RETRO_MEMORY_SYSTEM_RAM:
@@ -964,19 +989,19 @@ size_t retro_get_memory_size(unsigned id) {
       size = 0;
       break;
     case RETRO_MEMORY_SNES_BSX_PRAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeBsx) break;
-      size = SuperFamicom::bsxcartridge.psram.size();
+      if(core_interface.mode != LibretroInterface::ModeBsx) break;
+      size = SuperFamicom::bsmemory.memory.size();
       break;
     case RETRO_MEMORY_SNES_SUFAMI_TURBO_A_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeSufamiTurbo) break;
+      if(core_interface.mode != LibretroInterface::ModeSufamiTurbo) break;
       size = SuperFamicom::sufamiturboA.ram.size();
       break;
     case RETRO_MEMORY_SNES_SUFAMI_TURBO_B_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeSufamiTurbo) break;
+      if(core_interface.mode != LibretroInterface::ModeSufamiTurbo) break;
       size = SuperFamicom::sufamiturboB.ram.size();
       break;
     case RETRO_MEMORY_SNES_GAME_BOY_RAM:
-      if(core_interface.mode != SuperFamicomCartridge::ModeSuperGameBoy) break;
+      if(core_interface.mode != LibretroInterface::ModeSuperGameBoy) break;
       size = GameBoy::cartridge.ramsize;
       break;
 
