@@ -472,6 +472,10 @@ void retro_set_environment(retro_environment_t environ_cb)
 {
    core_bind.penviron = environ_cb;
 
+   static struct retro_log_callback log={retro_log_default};
+   core_bind.penviron(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, (void*)&log);
+   output=log.log;
+
    static const retro_subsystem_memory_info sgb_memory[] = {
       { "srm", RETRO_MEMORY_SNES_GAME_BOY_RAM },
       { "rtc", RETRO_MEMORY_SNES_GAME_BOY_RTC },
