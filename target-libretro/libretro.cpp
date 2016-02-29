@@ -583,6 +583,7 @@ void retro_cheat_reset(void) {
 }
 
 void retro_cheat_set(unsigned index, bool enable, const char *code) {
+  cheatList.reserve(index+1);
   cheatList[index].enable = enable;
   cheatList[index].code = code;
   lstring list;
