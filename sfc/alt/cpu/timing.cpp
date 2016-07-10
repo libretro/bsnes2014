@@ -21,7 +21,7 @@ void CPU::last_cycle() {
     if (!status.frame_event_performed) {
       scheduler.exit(Scheduler::ExitReason::FrameEvent);
     }
-    status.frame_event_performed = true;
+    status.frame_event_performed = false;
 #endif
   }
 
