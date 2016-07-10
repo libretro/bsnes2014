@@ -586,12 +586,11 @@ void retro_cheat_set(unsigned index, bool enable, const char *code) {
   cheatList.reserve(index+1);
   cheatList[index].enable = enable;
   cheatList[index].code = code;
-  lstring list;
 
+  lstring list;
   for(unsigned n = 0; n < cheatList.size(); n++) {
     if(cheatList[n].enable) list.append(cheatList[n].code);
   }
-
   core_interface.setCheats(list);
 }
 
