@@ -64,8 +64,8 @@ uninstall:
 ifeq ($(platform),linux)
 	rm $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.so
 else ifeq ($(platform),macosx)
-	rm /usr/local/lib/bsnes_$(profile)_libretro.dylib
+	rm $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.dylib
 else ifneq (,$(findstring ios,$(platform)))
-	rm /usr/local/lib/bsnes_$(profile)_libretro_ios.dylib
+	rm $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro_ios.dylib
 endif
 
