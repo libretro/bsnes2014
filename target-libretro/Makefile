@@ -5,6 +5,8 @@ include sfc/Makefile
 include gb/Makefile
 output := libretro
 
+core_installdir := $(prefix)/lib
+
 ifeq ($(platform),linux)
   flags += -fPIC
 else ifeq ($(platform),osx)
@@ -53,19 +55,19 @@ endif
 
 install:
 ifeq ($(platform),linux)
-	install -D -m 755 out/bsnes_$(profile)_libretro.so $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.so
+	install -D -m 755 out/bsnes_$(profile)_libretro.so $(DESTDIR)$(core_installdir)/bsnes_$(profile)_libretro.so
 else ifeq ($(platform),macosx)
-	cp out/bsnes_$(profile)_libretro.dylib $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.dylib
+	cp out/bsnes_$(profile)_libretro.dylib $(DESTDIR)$(core_installdir)/bsnes_$(profile)_libretro.dylib
 else ifneq (,$(findstring ios,$(platform)))
-	cp out/bsnes_$(profile)_libretro_ios.dylib $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro_ios.dylib
+	cp out/bsnes_$(profile)_libretro_ios.dylib $(DESTDIR)$(core_installdir)/bsnes_$(profile)_libretro_ios.dylib
 endif
 
 uninstall:
 ifeq ($(platform),linux)
-	rm $(DESTDIR)$(prefix)/lib/bsnes_$(profile)_libretro.so
+	rm $(DESTDIR)$(core_installdir)/bsnes_$(profile)_libretro.so
 else ifeq ($(platform),macosx)
-	rm /usr/local/lib/bsnes_$(profile)_libretro.dylib
+	rm $(DESTDIR)$(core_installdir)/bsnes_$(profile)_libretro.dylib
 else ifneq (,$(findstring ios,$(platform)))
-	rm /usr/local/lib/bsnes_$(profile)_libretro_ios.dylib
+	rm $(DESTDIR)$(core_installdir)/bsnes_$(profile)_libretro_ios.dylib
 endif
 
