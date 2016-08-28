@@ -68,20 +68,9 @@ void CPU::scanline() {
   synchronize_smp();
   synchronize_ppu();
   synchronize_coprocessors();
-#ifdef SFC_LAGFIX
   system.scanline(status.frame_event_performed);
-#else
-  system.scanline();
-#endif
 
-  if(vcounter() == 0)
-  {
-#ifdef SFC_LAGFIX
-    status.frame_event_performed = false;
-#endif
-    
-    hdma_init();
-  }
+  if(vcounter() == 0) hdma_init();
 
   queue.enqueue(534, QueueEvent::DramRefresh);
 
@@ -96,6 +85,7 @@ void CPU::scanline() {
     if(status.nmi_enabled) status.nmi_transition = true;
   } else if(nmi_valid && !status.nmi_valid) {
     status.nmi_line = false;
+    status.frame_event_performed = false;
   }
 
   if(status.auto_joypad_poll_enabled && vcounter() == (ppu.overscan() == false ? 227 : 242)) {
