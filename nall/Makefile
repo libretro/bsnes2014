@@ -36,11 +36,11 @@ endif
 # compiler detection
 ifeq ($(compiler),)
   ifeq ($(platform),windows)
-    compiler := g++
+    compiler := $(CXX)
   else ifeq ($(platform),osx)
     compiler := clang++ -stdlib=libc++
   else
-    compiler := g++
+    compiler := $(CXX)
   endif
 endif
 
