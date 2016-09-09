@@ -38,7 +38,7 @@ obj/libretro-$(profile).o: $(ui)/libretro.cpp $(ui)/*
 #targets
 build: $(objects)
 ifeq ($(platform),linux)
-	$(compiler) -o out/bsnes_$(profile)_libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
+	$(compiler) -o out/bsnes_$(profile)_libretro.so -shared $(objects) -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
 else ifneq (,$(findstring ios,$(platform)))
 	$(compiler) -o out/bsnes_$(profile)_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
 else ifeq ($(platform),macosx)
