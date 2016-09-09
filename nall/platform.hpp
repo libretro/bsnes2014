@@ -46,6 +46,7 @@ namespace Math {
   #else
     #include <endian.h>
   #endif
+  #include <machine/endian.h>
   #include <unistd.h>
   #include <pwd.h>
   #define dllexport
