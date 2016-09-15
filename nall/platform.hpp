@@ -43,10 +43,11 @@ namespace Math {
 #else
   #ifdef __APPLE__
     #include <machine/endian.h>
-  #else
+  #elif __linux__
     #include <endian.h>
+  #else
+    #include <machine/endian.h>
   #endif
-  #include <machine/endian.h>
   #include <unistd.h>
   #include <pwd.h>
   #define dllexport
