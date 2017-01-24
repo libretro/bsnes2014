@@ -801,7 +801,11 @@ static void init_descriptors(void)
    core_bind.penviron(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 }
 
-bool retro_load_game(const struct retro_game_info *info) {
+bool retro_load_game(const struct retro_game_info *info)
+{
+   if (!info)
+      return false;
+
   // Support loading a manifest directly.
   core_bind.manifest = info->path && string(info->path).endsWith(".bml");
   init_descriptors();
