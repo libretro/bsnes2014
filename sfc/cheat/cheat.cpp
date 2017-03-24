@@ -1,4 +1,5 @@
 #include <sfc/sfc.hpp>
+#include <iostream>
 
 #define CHEAT_CPP
 namespace SuperFamicom {
@@ -27,6 +28,16 @@ optional<unsigned> Cheat::find(unsigned addr, unsigned comp) {
     }
   }
   return false;
+}
+
+bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
+  std::cerr << "[bsnes]: Decoding cheats not implemented." << std::endl;
+  return false;
+}
+
+void Cheat::synchronize() {
+  std::cerr << "[bsnes]: Synchronizing cheats not implemented." << std::endl;
+  return;
 }
 
 }

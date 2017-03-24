@@ -400,8 +400,7 @@ Interface::Interface() {
   core_bind.iface = &core_interface;
 }
 
-void Interface::setCheats(const lstring &) {
-#if 0
+void Interface::setCheats(const lstring & list) {
   if(core_interface.mode == SuperFamicomCartridge::ModeSuperGameBoy) {
     GameBoy::cheat.reset();
     for(auto &code : list) {
@@ -409,8 +408,8 @@ void Interface::setCheats(const lstring &) {
       codelist.split("+", code);
       for(auto &part : codelist) {
         unsigned addr, data, comp;
-        if(GameBoy::Cheat::decode(part, addr, data, comp)) {
-          GameBoy::cheat.append({addr, data, comp});
+        if(GameBoy::cheat.decode(part, addr, comp, data)) {
+          GameBoy::cheat.append(addr, comp, data);
         }
       }
     }
@@ -424,14 +423,13 @@ void Interface::setCheats(const lstring &) {
     codelist.split("+", code);
     for(auto &part : codelist) {
       unsigned addr, data;
-      if(SuperFamicom::Cheat::decode(part, addr, data)) {
-        SuperFamicom::cheat.append({addr, data});
+      if(SuperFamicom::cheat.decode(part, addr, data)) {
+        SuperFamicom::cheat.append(addr, data);
       }
     }
   }
 
   SuperFamicom::cheat.synchronize();
-#endif
 }
 
 unsigned retro_api_version(void) {
@@ -583,7 +581,7 @@ void retro_cheat_reset(void) {
 }
 
 void retro_cheat_set(unsigned index, bool enable, const char *code) {
-  cheatList.reserve(index+1);
+  cheatList.resize(index+1);
   cheatList[index].enable = enable;
   cheatList[index].code = code;
 
