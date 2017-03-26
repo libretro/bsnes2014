@@ -27,6 +27,14 @@ optional<unsigned> Cheat::find(unsigned addr, unsigned comp) {
 }
 
 bool Cheat::decode(const char *part, unsigned &addr, unsigned &comp, unsigned &data) {
+  /* Code Types
+   * RAW:
+   *   AAAA:DD
+   * Game Genie: http://gamehacking.org/library/114
+   * GameShark: 0BDDAAAA - Byteswapped Address, bank+1
+   * Codebreaker: 0BAAAA-DD
+   * Xploder: Unknown
+   */
   std::cerr << "[bsnes]: Decoding cheats not implemented." << std::endl;
   return false;
 }
