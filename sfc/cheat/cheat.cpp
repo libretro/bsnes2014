@@ -70,12 +70,15 @@ static char genie_replace(char input){
       return 'F';
     case 'F':
     case 'f':
-      return '1';
+      break;
   }
+
+  return '1';
 }
 
 bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
   char addr_str[7], data_str[3];
+  char *nulstr = '\0';
   addr_str[6]=0;
   data_str[2]=0;
   addr=data=0;
@@ -84,8 +87,8 @@ bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
   if (strlen(part)>=9 && part[6]==':') {
     strncpy(addr_str,part,6);
     strncpy(data_str,part+7,2);
-    addr=strtoul(addr_str,'\0',16);
-    data=strtoul(data_str,'\0',16);
+    addr=strtoul(addr_str,&nulstr,16);
+    data=strtoul(data_str,&nulstr,16);
   }
 
   //Game Genie
@@ -97,8 +100,8 @@ bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
       data_str[i]=genie_replace(data_str[i]);
     for (int i=0;i<6;i++)
       addr_str[i]=genie_replace(addr_str[i]);
-    data=strtoul(data_str,'\0',16);
-    int addr_scrambled=strtoul(addr_str,'\0',16);
+    data=strtoul(data_str,&nulstr,16);
+    int addr_scrambled=strtoul(addr_str,&nulstr,16);
     addr=(addr_scrambled&0x003C00)<<10;
     addr|=(addr_scrambled&0x00003C)<<14;
     addr|=(addr_scrambled&0xF00000)>>8;
@@ -113,8 +116,8 @@ bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
   else if (strlen(part)==8) {
     strncpy(addr_str,part,6);
     strncpy(data_str,part+6,2);
-    addr=strtoul(addr_str,'\0',16);
-    data=strtoul(data_str,'\0',16);
+    addr=strtoul(addr_str,&nulstr,16);
+    data=strtoul(data_str,&nulstr,16);
   }
 
   //Gold Finger
@@ -138,20 +141,20 @@ bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
       } else {
         strncpy(pair_str,part+2*i-1,2);
       }
-      csum_calc+=strtoul(pair_str,'\0',16);
+      csum_calc+=strtoul(pair_str,&nulstr,16);
     }
     csum_calc-=0x160;
     csum_calc&=0xFF;
     strncpy(pair_str,part+11,2);
-    csum_code=strtoul(pair_str,'\0',16);
+    csum_code=strtoul(pair_str,&nulstr,16);
     if (csum_calc!=csum_code){
       std::cout << "[bsnes]: CHEAT: Goldfinger calculated checksum '" << std::hex << csum_calc <<  "' doesn't match code: " << part << std::endl;
       return false;
     }
 
-    int addr_scrambled=strtoul(addr_str,'\0',16);
+    int addr_scrambled=strtoul(addr_str,&nulstr,16);
     addr=(addr_scrambled&0x7FFF)|((addr_scrambled&0x7F8000)<<1)|0x8000;
-    data=strtoul(data_str,'\0',16);
+    data=strtoul(data_str,&nulstr,16);
     std::cout << "CHEAT: " << part << " decoded as " << std::hex <<  addr << ":" << data << std::endl;
   }
 
