@@ -644,7 +644,7 @@ void retro_cheat_set(unsigned index, bool enable, const char *code) {
     //Gold Finger
     else if (strlen(part)==14) {
       if (part[13]=='1'){
-        retro_log_default(RETRO_LOG_INFO,"CHEAT: Goldfinger SRAM cheats not supported: %s\n",part);
+        fprintf(stderr,"CHEAT: Goldfinger SRAM cheats not supported: %s\n",part);
         goto nextLine;
       }
       addr_str[0]='0';
@@ -671,7 +671,7 @@ void retro_cheat_set(unsigned index, bool enable, const char *code) {
       strncpy(pair_str,part+11,2);
       csum_code=strtoul(pair_str,&nulstr,16);
       if (csum_calc!=csum_code){
-        retro_log_default(RETRO_LOG_INFO,"CHEAT: Goldfinger calculated checksum '%X' doesn't match code: %s\n", csum_calc, part);
+        fprintf(stderr,"CHEAT: Goldfinger calculated checksum '%X' doesn't match code: %s\n", csum_calc, part);
         goto nextLine;
       }
 
@@ -686,11 +686,11 @@ void retro_cheat_set(unsigned index, bool enable, const char *code) {
 
     //Unknown
     else {
-      retro_log_default(RETRO_LOG_INFO, "CHEAT: Unrecognized code type: %s\n",part);
+      fprintf(stderr,"CHEAT: Unrecognized code type: %s\n",part);
     }
 
     if (addr == 0 || data == 0){
-      retro_log_default(RETRO_LOG_INFO,"CHEAT: Decoding failed: %s\n",part);
+      fprintf(stderr,"CHEAT: Decoding failed: %s\n",part);
     }
 
     nextLine:
