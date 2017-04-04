@@ -1,6 +1,5 @@
 #include <sfc/sfc.hpp>
 #include <iostream>
-#include <cstdlib>
 
 #define CHEAT_CPP
 namespace SuperFamicom {
@@ -109,7 +108,6 @@ bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
     addr|=(addr_scrambled&0x00C000)>>6;
     addr|=(addr_scrambled&0x0F0000)>>12;
     addr|=(addr_scrambled&0x0003C0)>>6;
-    return true;
   }
 
   //PAR & X-Terminator
@@ -155,7 +153,6 @@ bool Cheat::decode(const char *part, unsigned &addr, unsigned &data) {
     int addr_scrambled=strtoul(addr_str,&nulstr,16);
     addr=(addr_scrambled&0x7FFF)|((addr_scrambled&0x7F8000)<<1)|0x8000;
     data=strtoul(data_str,&nulstr,16);
-    std::cout << "CHEAT: " << part << " decoded as " << std::hex <<  addr << ":" << data << std::endl;
   }
 
   //Unknown
