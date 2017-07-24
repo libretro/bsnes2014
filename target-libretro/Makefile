@@ -16,9 +16,12 @@ else ifneq (,$(findstring ios,$(platform)))
 ifeq ($(IOSSDK),)
    IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 endif
-
-flags += -arch armv7 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
-ifeq ($(platform),ios9)
+ifeq ($(platform),ios-arm64)
+	flags += -arch arm64 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
+else
+  flags += -arch armv7 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
+endif
+ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
 	flags += -miphoneos-version-min=8.0
 else
 	flags += -miphoneos-version-min=5.0
@@ -45,7 +48,11 @@ build: $(objects)
 ifeq ($(platform),linux)
 	$(compiler) -o out/bsnes_$(profile)_libretro.so -shared $(objects) -ldl -Wl,--no-undefined -Wl,--version-script=$(ui)/link.T
 else ifneq (,$(findstring ios,$(platform)))
-	$(compiler) -o out/bsnes_$(profile)_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
+  ifeq ($(platform),ios-arm64)
+		$(compiler) -o out/bsnes_$(profile)_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch arm64
+  else
+		$(compiler) -o out/bsnes_$(profile)_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
+  endif
 else ifeq ($(platform),macosx)
 ifdef ($(NOUNIVERSAL))
 	$(compiler) -o out/bsnes_$(profile)_libretro.dylib -dynamiclib $(objects)
