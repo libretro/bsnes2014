@@ -27,12 +27,6 @@ ifeq ($(platform),)
   endif
 endif
 
-ifeq ($(platform),windows)
-  delete = del /F /Q $(subst /,\,$1)
-else
-  delete = rm -f $1
-endif
-
 # compiler detection
 ifeq ($(compiler),)
   ifeq ($(platform),windows)
