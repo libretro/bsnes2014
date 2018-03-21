@@ -1071,7 +1071,6 @@ size_t retro_get_memory_size(unsigned id) {
   switch(id) {
     case RETRO_MEMORY_SAVE_RAM:
       size = core_bind.sram_size;
-      fprintf(stderr, "[bsnes]: SRAM memory size: %u.\n", (unsigned)size);
       break;
     case RETRO_MEMORY_RTC:
       size = 0;
