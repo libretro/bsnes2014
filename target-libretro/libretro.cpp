@@ -413,8 +413,8 @@ void retro_set_environment(retro_environment_t environ_cb)
    };
 
    static const struct retro_subsystem_rom_info sgb_roms[] = {
-      { "GameBoy", "gb|gbc", false, false, true, sgb_memory, 2 },
-      { "Super GameBoy BIOS", "sfc|smc", false, false, true, NULL, 0 },
+      { "Game Boy", "gb|gbc", false, false, true, sgb_memory, 2 },
+      { "Super Game Boy BIOS", "sfc|smc", false, false, true, NULL, 0 },
    };
 
    static const retro_subsystem_memory_info sufami_a_memory[] = {
@@ -443,7 +443,7 @@ void retro_set_environment(retro_environment_t environ_cb)
 
    // OR in 0x1000 on types to remain ABI compat with the older-style retro_load_game_special().
    static const struct retro_subsystem_info subsystems[] = {
-      { "Super GameBoy", "sgb", sgb_roms, 2, RETRO_GAME_TYPE_SUPER_GAME_BOY | 0x1000 }, // Super Gameboy
+      { "Super Game Boy", "sgb", sgb_roms, 2, RETRO_GAME_TYPE_SUPER_GAME_BOY | 0x1000 }, // Super Gameboy
       { "Sufami Turbo", "sufami", sufami_roms, 3, RETRO_GAME_TYPE_SUFAMI_TURBO | 0x1000 }, // Sufami Turbo
       { "BSX", "bsx", bsx_roms, 2, RETRO_GAME_TYPE_BSX | 0x1000 }, // BSX
       { "BSX slotted", "bsxslot", bsx_roms, 2, RETRO_GAME_TYPE_BSX_SLOTTED | 0x1000 }, // BSX slotted
