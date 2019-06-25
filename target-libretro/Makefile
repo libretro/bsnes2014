@@ -17,9 +17,9 @@ ifeq ($(IOSSDK),)
    IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 endif
 ifeq ($(platform),ios-arm64)
-	flags += -arch arm64 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
+	flags += -arch arm64 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w -DIOS
 else
-  flags += -arch armv7 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w
+  flags += -arch armv7 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w -DIOS
 endif
 ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
 	flags += -miphoneos-version-min=8.0
