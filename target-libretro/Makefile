@@ -26,6 +26,12 @@ ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
 else
 	flags += -miphoneos-version-min=5.0
 endif
+else ifeq ($(platform), tvos-arm64)
+
+ifeq ($(IOSSDK),)
+   IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
+endif
+flags += -arch arm64 -fPIC -isysroot $(IOSSDK) -marm -DHAVE_POSIX_MEMALIGN=1 -w -DIOS
 endif
 
 flags += -D__LIBRETRO__
@@ -53,6 +59,8 @@ else ifneq (,$(findstring ios,$(platform)))
   else
 		$(compiler) -o out/bsnes_$(profile)_libretro_ios.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch armv7
   endif
+else ifeq ($(platform), tvos-arm64)
+		$(compiler) -o out/bsnes_$(profile)_libretro_tvos.dylib -dynamiclib $(objects) -isysroot $(IOSSDK) -arch arm64
 else ifeq ($(platform),macosx)
 ifdef ($(NOUNIVERSAL))
 	$(compiler) -o out/bsnes_$(profile)_libretro.dylib -dynamiclib $(objects)
