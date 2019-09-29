@@ -80,7 +80,7 @@ else ifeq ($(profile),accuracy) # If you're batshit insane
 endif
 
 include $(CLEAR_VARS)
-LOCAL_MODULE       := retro_bsnes_$(profile)
+LOCAL_MODULE       := retro_bsnes2014_$(profile)
 LOCAL_SRC_FILES    := $(SRCFILES)
 LOCAL_CPPFLAGS     := -std=gnu++11 $(COREFLAGS)
 LOCAL_CFLAGS       := $(COREFLAGS)
