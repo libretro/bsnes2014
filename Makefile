@@ -1,6 +1,6 @@
 DEBUG = 0
 FRONTEND_SUPPORTS_RGB565 = 1
-PROFILE = accuracy
+PROFILE = performance
 
 CORE_DIR := .
 CFLAGS :=
