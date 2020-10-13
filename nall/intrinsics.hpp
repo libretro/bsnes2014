@@ -22,7 +22,6 @@ struct Intrinsics {
   #define COMPILER_VISUALCPP
   Intrinsics::Compiler Intrinsics::compiler() { return Intrinsics::Compiler::VisualCPP; }
 #else
-  #warning "unable to detect compiler"
   #define COMPILER_UNKNOWN
   Intrinsics::Compiler Intrinsics::compiler() { return Intrinsics::Compiler::Unknown; }
 #endif
@@ -39,7 +38,6 @@ struct Intrinsics {
   #define PLATFORM_X
   Intrinsics::Platform Intrinsics::platform() { return Intrinsics::Platform::X; }
 #else
-  #warning "unable to detect platform"
   #define PLATFORM_UNKNOWN
   Intrinsics::Platform Intrinsics::platform() { return Intrinsics::Platform::Unknown; }
 #endif
@@ -59,7 +57,6 @@ struct Intrinsics {
   #define ARCH_ARM
   Intrinsics::Architecture Intrinsics::architecture() { return Intrinsics::Architecture::ARM; }
 #else
-  #warning "unable to detect architecture"
   #define ARCH_UNKNOWN
   Intrinsics::Architecture Intrinsics::architecture() { return Intrinsics::Architecture::Unknown; }
 #endif
@@ -73,7 +70,6 @@ struct Intrinsics {
   #define ENDIAN_MSB
   Intrinsics::Endian Intrinsics::endian() { return Intrinsics::Endian::MSB; }
 #else
-  #warning "unable to detect endian"
   #define ENDIAN_UNKNOWN
   Intrinsics::Endian Intrinsics::endian() { return Intrinsics::Endian::Unknown; }
 #endif
